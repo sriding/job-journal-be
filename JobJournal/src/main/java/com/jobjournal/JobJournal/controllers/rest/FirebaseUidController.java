@@ -42,7 +42,7 @@ public class FirebaseUidController {
     // Will most likely delete this
     @GetMapping(path = "/get")
     public String getCurrentUserAuth0Id(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @Value("${spring.auth0.domain}") String domain) {
+            @Value("${AUTH0_DOMAIN}") String domain) {
         try {
             return GetUserInfoFromAuth0.getSubFromUserInfoInAuth0(token, domain);
         } catch (Exception e) {
