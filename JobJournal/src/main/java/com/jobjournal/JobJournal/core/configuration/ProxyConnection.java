@@ -6,13 +6,14 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 
-@Configuration
-public class ProxyConnection {
-    @Bean
-    public void connect() {
+@Component
+public class ProxyConnection implements ApplicationRunner {
+    @Override
+    public void run(ApplicationArguments args) {
         try {
             URL proxyUrl = new URL(System.getenv("QUOTAGUARDSTATIC_URL"));
             String userInfo = proxyUrl.getUserInfo();
