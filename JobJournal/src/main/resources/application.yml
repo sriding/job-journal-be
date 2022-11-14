@@ -1,0 +1,20 @@
+spring:
+  config:
+    import: optional:.env[.properties]
+  auth0:
+    domain: ${AUTH0_DOMAIN}
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_EXTERNAL_PORT}/${MYSQL_DATABASE_NAME}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_USER_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH0_ISSUER-URI}
+auth0:
+  audience: ${AUTH0_AUDIENCE}
