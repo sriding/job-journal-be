@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -Dspring.datasource.url=${MYSQL_URL} -Dspring.datasource.username=${MYSQL_USERNAME} -Dspring.datasource.password=${MYSQL_USER_PASSWORD} -Dspring.auth0.domain=${AUTH0_DOMAIN} -Dspring.security.oauth2.resourceserver.jwt.issuer-uri=${AUTH0_ISSUER-URI} -Dauth0.audience${AUTH0_AUDIENCE} $JAVA_OPTS -jar target/JobJournal-0.0.1-SNAPSHOT.jar

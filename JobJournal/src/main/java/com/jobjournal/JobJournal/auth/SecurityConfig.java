@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .mvcMatchers("/").authenticated()
+                .mvcMatchers("/*").authenticated()
                 .and().cors()
                 .and().oauth2ResourceServer().jwt();
         return http.build();
