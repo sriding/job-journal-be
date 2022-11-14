@@ -18,3 +18,5 @@ spring:
           issuer-uri: ${AUTH0_ISSUER-URI}
 auth0:
   audience: ${AUTH0_AUDIENCE}
+quotaguardshield:
+  url: ${QUOTAGUARDSHIELD_URL}

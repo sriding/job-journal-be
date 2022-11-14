@@ -1,11 +1,7 @@
 package com.jobjournal.JobJournal;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Authenticator;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
@@ -16,9 +12,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class JobJournalApplication {
+	@Value("${QUOTAGUARDSHIELD_URL}")
+	private static String quotaguardUrl;
+
 	public static void main(String[] args) {
 		try {
-			URL proxyUrl = new URL(System.getenv("QUOTAGUARDSTATIC_URL"));
+			URL proxyUrl = new URL(quotaguardUrl);
 			String userInfo = proxyUrl.getUserInfo();
 			String user = userInfo.substring(0, userInfo.indexOf(':'));
 			String password = userInfo.substring(userInfo.indexOf(':') + 1);
@@ -35,7 +34,6 @@ public class JobJournalApplication {
 
 			URL url = new URL("http://ip.quotaguard.com");
 			conn = url.openConnection();
-			conn.connect();
 
 			SpringApplication.run(JobJournalApplication.class, args);
 		} catch (IOException ie) {
