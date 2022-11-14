@@ -16,10 +16,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${auth0.audience}")
+    @Value("${AUTH0_AUDIENCE}")
     private String audience;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    @Value("${AUTH0_ISSUER-URI}")
     private String issuer;
 
     @Bean
