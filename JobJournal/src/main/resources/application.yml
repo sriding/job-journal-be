@@ -10,7 +10,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
   security:
     oauth2:
       resourceserver:
@@ -18,5 +18,3 @@ spring:
           issuer-uri: ${AUTH0_ISSUER-URI}
 auth0:
   audience: ${AUTH0_AUDIENCE}
-quotaguardshield:
-  url: ${QUOTAGUARDSHIELD_URL}

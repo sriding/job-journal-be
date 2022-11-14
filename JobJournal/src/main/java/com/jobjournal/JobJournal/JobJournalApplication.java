@@ -6,18 +6,14 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class JobJournalApplication {
-	@Value("${QUOTAGUARDSHIELD_URL}")
-	private static String quotaguardUrl;
-
 	public static void main(String[] args) {
 		try {
-			URL proxyUrl = new URL(quotaguardUrl);
+			URL proxyUrl = new URL(System.getenv("QUOTAGUARDSHIELD_URL"));
 			String userInfo = proxyUrl.getUserInfo();
 			String user = userInfo.substring(0, userInfo.indexOf(':'));
 			String password = userInfo.substring(userInfo.indexOf(':') + 1);
