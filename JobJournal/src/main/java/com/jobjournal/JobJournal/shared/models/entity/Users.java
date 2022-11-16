@@ -23,9 +23,6 @@ public class Users {
     @Column(name = "auth0_id", unique = true, nullable = false)
     private String auth0Id;
 
-    @Column(name = "email", nullable = false)
-    private String email;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Setting setting;
 
@@ -37,6 +34,10 @@ public class Users {
 
     // no-arg constructor required for entity object
     public Users() {
+    }
+
+    public Users(String auth0Id) {
+        this.auth0Id = auth0Id;
     }
 
     public Long getId() {
@@ -53,13 +54,5 @@ public class Users {
 
     public void setAuth0Id(String auth0Id) {
         this.auth0Id = auth0Id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }
