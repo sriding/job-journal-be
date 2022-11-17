@@ -1,5 +1,6 @@
 package com.jobjournal.JobJournal.shared.models.entity;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
@@ -12,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.jobjournal.JobJournal.shared.enums.JobStatus;
 import com.jobjournal.JobJournal.shared.enums.JobType;
@@ -50,6 +54,14 @@ public class Job {
 
     @Column(name = "application_dismissed_date", columnDefinition = "DATE")
     private LocalDate applictionDismissedDate;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", updatable = false)
+    private Date dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "update_date")
+    private Date dateUpdated;
 
     // no-arg constructor required for entity object
     public Job() {
@@ -125,5 +137,21 @@ public class Job {
 
     public void setApplictionDismissedDate(LocalDate applictionDismissedDate) {
         this.applictionDismissedDate = applictionDismissedDate;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 }

@@ -1,5 +1,7 @@
 package com.jobjournal.JobJournal.shared.models.entity;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "USERPROFILES")
@@ -24,8 +29,21 @@ public class UserProfiles {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @CreationTimestamp
+    @Column(name = "creation_date", updatable = false)
+    private Date dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "update_date")
+    private Date dateUpdated;
+
     // no arg constructor required for entity object
     public UserProfiles() {
+    }
+
+    public UserProfiles(Long userId, String name) {
+        this.user.setId(userId);
+        this.name = name;
     }
 
     public Long getId() {
@@ -50,5 +68,21 @@ public class UserProfiles {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 }

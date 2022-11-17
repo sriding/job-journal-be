@@ -24,4 +24,8 @@ public class Auth0RequestService {
     public static String getSubFromUserInfoInAuth0(String token, String domain) throws Exception {
         return getAllUserInfoFromAuth0(token, domain).getSub();
     }
+
+    public static String getFullNameFromUserInfoInAuth0(String token, String domain) throws Exception {
+        return getAllUserInfoFromAuth0(token, domain).getName();
+    }
 }

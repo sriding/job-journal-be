@@ -1,5 +1,7 @@
 package com.jobjournal.JobJournal.shared.models.entity;
 
+import java.sql.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "POST")
@@ -25,6 +30,14 @@ public class Post {
 
     @Column(name = "Notes")
     private String notes;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", updatable = false)
+    private Date dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "update_date")
+    private Date dateUpdated;
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
     private Company company;
@@ -58,5 +71,21 @@ public class Post {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 }

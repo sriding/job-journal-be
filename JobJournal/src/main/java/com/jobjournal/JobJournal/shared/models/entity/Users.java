@@ -1,5 +1,6 @@
 package com.jobjournal.JobJournal.shared.models.entity;
 
+import java.sql.Date;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -12,6 +13,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity
 @Table(name = "USERS")
 public class Users {
@@ -22,6 +26,14 @@ public class Users {
 
     @Column(name = "auth0_id", unique = true, nullable = false)
     private String auth0Id;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", updatable = false)
+    private Date dateCreated;
+
+    @UpdateTimestamp
+    @Column(name = "update_date")
+    private Date dateUpdated;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Setting setting;
@@ -54,5 +66,21 @@ public class Users {
 
     public void setAuth0Id(String auth0Id) {
         this.auth0Id = auth0Id;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(Date dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 }
