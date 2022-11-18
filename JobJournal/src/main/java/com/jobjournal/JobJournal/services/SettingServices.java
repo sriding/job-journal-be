@@ -7,7 +7,7 @@ import com.jobjournal.JobJournal.repositories.SettingRepository;
 
 @Service
 public class SettingServices {
-    private SettingRepository settingRepository;
+    private final SettingRepository settingRepository;
 
     @Autowired
     public SettingServices(SettingRepository settingRepository) {

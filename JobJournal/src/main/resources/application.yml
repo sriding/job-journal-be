@@ -18,6 +18,3 @@ spring:
           issuer-uri: ${AUTH0_ISSUER-URI}
 auth0:
   audience: ${AUTH0_AUDIENCE}
-rest:
-  api:
-    version: v100

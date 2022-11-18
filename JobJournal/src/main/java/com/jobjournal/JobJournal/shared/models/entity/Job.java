@@ -43,11 +43,11 @@ public class Job {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private JobType type;
+    private JobType typeEnum;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private JobStatus status;
+    private JobStatus statusEnum;
 
     @Column(name = "application_submitted_date", columnDefinition = "DATE")
     private LocalDate applicationDate;
@@ -65,6 +65,18 @@ public class Job {
 
     // no-arg constructor required for entity object
     public Job() {
+    }
+
+    public Job(Long postId, String title, String information, String location, String type, String status,
+            LocalDate applicationDate, LocalDate applicationDismissedDate) throws Exception {
+        this.post.setId(postId);
+        this.title = title;
+        this.information = information;
+        this.location = location;
+        this.typeEnum = JobType.valueOf(type);
+        this.statusEnum = JobStatus.valueOf(status);
+        this.applicationDate = applicationDate;
+        this.applictionDismissedDate = applicationDismissedDate;
     }
 
     public Long getId() {
@@ -107,20 +119,20 @@ public class Job {
         this.location = location;
     }
 
-    public JobType getType() {
-        return type;
+    public JobType getTypeEnum() {
+        return typeEnum;
     }
 
-    public void setType(JobType type) {
-        this.type = type;
+    public void setTypeEnum(JobType typeEnum) {
+        this.typeEnum = typeEnum;
     }
 
-    public JobStatus getStatus() {
-        return status;
+    public JobStatus getStatusEnum() {
+        return statusEnum;
     }
 
-    public void setStatus(JobStatus status) {
-        this.status = status;
+    public void setStatusEnum(JobStatus statusEnum) {
+        this.statusEnum = statusEnum;
     }
 
     public LocalDate getApplicationDate() {

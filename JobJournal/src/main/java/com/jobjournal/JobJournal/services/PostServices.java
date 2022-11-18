@@ -1,10 +1,15 @@
 package com.jobjournal.JobJournal.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.jobjournal.JobJournal.repositories.PostRepository;
 
+@Service
 public class PostServices {
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
+    @Autowired
     public PostServices(PostRepository postRepository) {
         this.postRepository = postRepository;
     }

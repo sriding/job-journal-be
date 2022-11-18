@@ -26,7 +26,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 @CrossOrigin
 public class UsersController extends RequiredAbstractClassForControllers {
     // Services
-    private UsersServices usersServices;
+    private final UsersServices usersServices;
 
     // Pass in repository that will work with services
     @Autowired

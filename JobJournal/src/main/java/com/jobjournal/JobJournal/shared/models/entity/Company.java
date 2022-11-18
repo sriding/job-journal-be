@@ -47,6 +47,13 @@ public class Company {
     public Company() {
     }
 
+    public Company(Long postId, String name, String website, String information) {
+        this.post.setId(postId);
+        this.name = name;
+        this.website = website;
+        this.information = information;
+    }
+
     public Long getId() {
         return id;
     }

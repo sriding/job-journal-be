@@ -23,12 +23,12 @@ import com.jobjournal.JobJournal.services.UsersServices;
 import com.jobjournal.JobJournal.shared.models.entity.Setting;
 
 @RestController
-@RequestMapping(path = "/api/settings")
+@RequestMapping(path = "/api/setting")
 @CrossOrigin
 public class SettingController extends RequiredAbstractClassForControllers {
     // Services
-    private SettingServices settingServices;
-    private UsersServices usersServices;
+    private final SettingServices settingServices;
+    private final UsersServices usersServices;
 
     @Autowired
     public SettingController(SettingRepository settingRepository, UsersRepository usersRepository) {

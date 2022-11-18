@@ -49,6 +49,10 @@ public class Post {
     public Post() {
     }
 
+    public Post(String notes) {
+        this.notes = notes;
+    }
+
     public Long getId() {
         return id;
     }
