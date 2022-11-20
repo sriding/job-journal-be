@@ -23,7 +23,7 @@ public class Setting {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private Users user;
 
     @CreationTimestamp
@@ -38,8 +38,8 @@ public class Setting {
     public Setting() {
     }
 
-    public Setting(Long userId) {
-        this.user.setId(userId);
+    public Setting(Users user) {
+        this.user = user;
     }
 
     public Long getId() {

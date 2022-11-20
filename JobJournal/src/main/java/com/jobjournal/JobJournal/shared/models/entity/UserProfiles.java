@@ -23,7 +23,7 @@ public class UserProfiles {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private Users user;
 
     @Column(name = "name", nullable = false)
@@ -41,8 +41,8 @@ public class UserProfiles {
     public UserProfiles() {
     }
 
-    public UserProfiles(Long userId, String name) {
-        this.user.setId(userId);
+    public UserProfiles(Users user, String name) {
+        this.user = user;
         this.name = name;
     }
 

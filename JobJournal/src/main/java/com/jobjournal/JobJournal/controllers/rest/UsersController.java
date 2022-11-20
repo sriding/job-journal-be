@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
-import com.jobjournal.JobJournal.exceptions.handlers.Auth0IdNotFoundException;
+import com.jobjournal.JobJournal.exceptions.handlers.UserIdNotFoundException;
 import com.jobjournal.JobJournal.repositories.UsersRepository;
 import com.jobjournal.JobJournal.services.UsersServices;
 import com.jobjournal.JobJournal.shared.models.entity.Users;
@@ -28,41 +28,39 @@ public class UsersController extends RequiredAbstractClassForControllers {
     // Services
     private final UsersServices usersServices;
 
-    // Pass in repository that will work with services
+    // Pass in repositories that will work with services
     @Autowired
-    public UsersController(UsersServices usersServices, UsersRepository usersRepository) {
+    public UsersController(UsersRepository usersRepository) {
         this.usersServices = new UsersServices(usersRepository);
     }
 
     // Get User Id using Auth0 token
-    @GetMapping(path = "/getuserid")
+    @GetMapping(path = "/get/userid/by/token")
     public ResponseEntity<?> getUserIdUsingToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
-            Optional<Long> id = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
-            return ResponseEntity.ok().body(id);
-        } catch (Auth0IdNotFoundException e) {
-            return ResponseEntity.badRequest().body("Firebase Uid cannot be null.");
+            Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
+            if (userId.isPresent()) {
+                return ResponseEntity.ok().body(userId);
+            } else {
+                throw new UserIdNotFoundException();
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Server is having issues, try again later or report steps that led to this occuring.");
+            return ResponseEntity.badRequest().body(e);
         }
     }
 
     // Create a new user using Auth0 token and requesting Auth0 user id from Auth0
-    @PostMapping(path = "/create")
+    @PostMapping(path = "/create/newuser/by/token")
     public ResponseEntity<?> createUserUsingToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
-            String auth0id = getAuth0IdByToken(token, getAuth0Domain());
-            Users newUser = new Users(auth0id);
-            return ResponseEntity.ok().body(this.usersServices.getRepository().save(newUser));
+            String auth0Id = getAuth0IdByToken(token, getAuth0Domain());
+            return ResponseEntity.ok().body(this.usersServices.getRepository().save(new Users(auth0Id)));
         } catch (IllegalArgumentException ie) {
-            return ResponseEntity.badRequest().body("Firebase Uid cannot be null.");
+            return ResponseEntity.badRequest().body("Auth0 Id cannot be null.");
         } catch (OptimisticLockingFailureException ofe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Database is having issues (Version attribute is different or firebase table not found).");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ofe);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Server is having issues, try again later or report steps that led to this occuring.");
+            return ResponseEntity.badRequest().body(e);
         }
     }
 
@@ -83,19 +81,17 @@ public class UsersController extends RequiredAbstractClassForControllers {
             // profile and setting information back to db and return error.
             return ResponseEntity.ok().body(null);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Server is having issues, try again later or report steps that led to this occuring.");
+            return ResponseEntity.badRequest().body(e);
         }
     }
 
     // For development purposes...
-    @GetMapping(path = "/gettoken")
+    @GetMapping(path = "/get/token/by/token")
     public ResponseEntity<?> getCurrentUserAuth0Id(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
             return ResponseEntity.ok().body(token);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Server is having issues, try again later or report steps that led to this occuring.");
+            return ResponseEntity.badRequest().body(e);
         }
     }
 }

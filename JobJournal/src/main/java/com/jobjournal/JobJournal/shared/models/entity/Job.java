@@ -29,7 +29,7 @@ public class Job {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false, unique = true)
     private Post post;
 
     @Column(name = "title", nullable = false)
@@ -53,7 +53,7 @@ public class Job {
     private LocalDate applicationDate;
 
     @Column(name = "application_dismissed_date", columnDefinition = "DATE")
-    private LocalDate applictionDismissedDate;
+    private LocalDate applicationDismissedDate;
 
     @CreationTimestamp
     @Column(name = "creation_date", updatable = false)
@@ -67,16 +67,29 @@ public class Job {
     public Job() {
     }
 
-    public Job(Long postId, String title, String information, String location, String type, String status,
+    // If this constructor is used, a post field must be set manually after
+    // intialization
+    public Job(String title, String information, String location, String type, String status,
             LocalDate applicationDate, LocalDate applicationDismissedDate) throws Exception {
-        this.post.setId(postId);
         this.title = title;
         this.information = information;
         this.location = location;
         this.typeEnum = JobType.valueOf(type);
         this.statusEnum = JobStatus.valueOf(status);
         this.applicationDate = applicationDate;
-        this.applictionDismissedDate = applicationDismissedDate;
+        this.applicationDismissedDate = applicationDismissedDate;
+    }
+
+    public Job(Post post, String title, String information, String location, String type, String status,
+            LocalDate applicationDate, LocalDate applicationDismissedDate) throws Exception {
+        this.post = post;
+        this.title = title;
+        this.information = information;
+        this.location = location;
+        this.typeEnum = JobType.valueOf(type);
+        this.statusEnum = JobStatus.valueOf(status);
+        this.applicationDate = applicationDate;
+        this.applicationDismissedDate = applicationDismissedDate;
     }
 
     public Long getId() {
@@ -143,12 +156,12 @@ public class Job {
         this.applicationDate = applicationDate;
     }
 
-    public LocalDate getApplictionDismissedDate() {
-        return applictionDismissedDate;
+    public LocalDate getApplicationDismissedDate() {
+        return applicationDismissedDate;
     }
 
-    public void setApplictionDismissedDate(LocalDate applictionDismissedDate) {
-        this.applictionDismissedDate = applictionDismissedDate;
+    public void setApplicationDismissedDate(LocalDate applicationDismissedDate) {
+        this.applicationDismissedDate = applicationDismissedDate;
     }
 
     public Date getDateCreated() {

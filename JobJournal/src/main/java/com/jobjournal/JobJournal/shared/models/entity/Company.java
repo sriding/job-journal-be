@@ -23,7 +23,7 @@ public class Company {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false, unique = true)
     private Post post;
 
     @Column(name = "name", nullable = false)
@@ -47,8 +47,16 @@ public class Company {
     public Company() {
     }
 
-    public Company(Long postId, String name, String website, String information) {
-        this.post.setId(postId);
+    // If this constructor is used, the post will need to be set manually after
+    // intialization
+    public Company(String name, String website, String information) {
+        this.name = name;
+        this.website = website;
+        this.information = information;
+    }
+
+    public Company(Post post, String name, String website, String information) {
+        this.post = post;
         this.name = name;
         this.website = website;
         this.information = information;

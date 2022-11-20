@@ -3,13 +3,17 @@ package com.jobjournal.JobJournal.controllers.rest;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +41,7 @@ public class CompanyController extends RequiredAbstractClassForControllers {
     private final PostServices postsServices;
     private final UsersServices usersServices;
 
+    // Add in repositories for services to use
     @Autowired
     public CompanyController(CompanyRepository companyRepository, PostRepository postRepository,
             UsersRepository usersRepository) {
@@ -45,9 +50,13 @@ public class CompanyController extends RequiredAbstractClassForControllers {
         this.usersServices = new UsersServices(usersRepository);
     }
 
-    @GetMapping(path = "/getbypostid")
-    public ResponseEntity<?> getCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, Long postId) {
+    // Get company data with token and post id
+    @GetMapping(path = "/get/company/by/{postId}")
+    public ResponseEntity<?> getCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+            @PathVariable Long postId) {
         try {
+            // Have to confirm the user id obtained through the token matches the user id
+            // present in the post obtained from the postId
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
@@ -69,17 +78,24 @@ public class CompanyController extends RequiredAbstractClassForControllers {
         }
     }
 
-    @PostMapping(path = "/create")
-    public ResponseEntity<?> createCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, Long postId,
-            String name, String website, String information) {
+    // Create new company using token and post id, along with company model data
+    // present in request body
+    @PostMapping(path = "/create/company/by/{postId}")
+    public ResponseEntity<?> createCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+            @PathVariable Long postId,
+            @RequestBody Company company) {
         try {
+            // Have to confirm the user id obtained through the token matches the user id
+            // present in the post obtained from the postId
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
                     if (userId.get() == post.get().getUser().getId()) {
-                        Company newCompany = new Company(postId, name, website, information);
-                        return ResponseEntity.ok().body(this.companyServices.getRepository().save(newCompany));
+                        // The requester does not pass in a post attribute for the company, so it must
+                        // be added manually.
+                        company.setPost(post.get());
+                        return ResponseEntity.ok().body(this.companyServices.getRepository().save(company));
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -89,26 +105,35 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.badRequest().body("Null value is invalidating request.");
+        } catch (OptimisticLockingFailureException olfe) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
         }
     }
 
-    @PutMapping(path = "/update")
-    public ResponseEntity<?> updateCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, Long postId,
-            String name, String website, String information) {
+    // Update company data using the token and post id
+    @PutMapping(path = "/update/company/by/{postId}")
+    public ResponseEntity<?> updateCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+            @PathVariable Long postId,
+            @RequestBody Company company) {
         try {
+            // Have to confirm the user id obtained through the token matches the user id
+            // present in the post obtained from the postId
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
                     if (userId.get() == post.get().getUser().getId()) {
-                        Optional<Company> company = this.companyServices.getRepository().findCompanyByPostId(postId);
-                        if (company.isPresent()) {
-                            company.map(c -> {
-                                c.setName(name);
-                                c.setWebsite(website);
-                                c.setInformation(information);
+                        Optional<Company> dbCompany = this.companyServices.getRepository().findCompanyByPostId(postId);
+                        if (dbCompany.isPresent()) {
+                            dbCompany.map(c -> {
+                                c.setName(company.getName());
+                                c.setWebsite(company.getWebsite());
+                                c.setInformation(company.getInformation());
+
                                 return this.companyServices.getRepository().save(c);
                             });
 
@@ -125,21 +150,32 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.badRequest().body("Null value is invalidating request.");
+        } catch (OptimisticLockingFailureException olfe) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
         }
     }
 
-    @DeleteMapping(path = "/delete")
+    // Delete a company using token and post id
+    @DeleteMapping(path = "/delete/company/by/{postId}")
     public ResponseEntity<?> deleteCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            Long postId) {
+            @PathVariable Long postId) {
         try {
+            // Have to confirm the user id obtained through the token matches the user id
+            // present in the post obtained from the postId
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    this.companyServices.getRepository().deleteCompanyByPostId(postId);
-                    return ResponseEntity.ok().body(null);
+                    if (userId.get() == post.get().getUser().getId()) {
+                        this.companyServices.getRepository().deleteCompanyByPostId(postId);
+                        return ResponseEntity.ok().body("Deleted.");
+                    } else {
+                        throw new UserIdDoesNotMatchException();
+                    }
                 } else {
                     throw new PostNotFoundException();
                 }

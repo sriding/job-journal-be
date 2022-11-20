@@ -49,7 +49,14 @@ public class Post {
     public Post() {
     }
 
+    // If this constructor is used, the user field must be set manually after
+    // initalization
     public Post(String notes) {
+        this.notes = notes;
+    }
+
+    public Post(Users user, String notes) {
+        this.user = user;
         this.notes = notes;
     }
 
