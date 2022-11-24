@@ -61,7 +61,7 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         return ResponseEntity.ok()
                                 .body(this.companyServices.getRepository().findCompanyByPostId(postId));
                     } else {
@@ -74,7 +74,7 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -91,10 +91,10 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         // The requester does not pass in a post attribute for the company, so it must
                         // be added manually.
-                        company.setPost(post.get());
+                        company.set_post(post.get());
                         return ResponseEntity.ok().body(this.companyServices.getRepository().save(company));
                     } else {
                         throw new UserIdDoesNotMatchException();
@@ -108,9 +108,9 @@ public class CompanyController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -126,13 +126,13 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         Optional<Company> dbCompany = this.companyServices.getRepository().findCompanyByPostId(postId);
                         if (dbCompany.isPresent()) {
                             dbCompany.map(c -> {
-                                c.setName(company.getName());
-                                c.setWebsite(company.getWebsite());
-                                c.setInformation(company.getInformation());
+                                c.set_company_name(company.get_company_name());
+                                c.set_company_website(company.get_company_website());
+                                c.set_company_information(company.get_company_information());
 
                                 return this.companyServices.getRepository().save(c);
                             });
@@ -153,9 +153,9 @@ public class CompanyController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -170,7 +170,7 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         this.companyServices.getRepository().deleteCompanyByPostId(postId);
                         return ResponseEntity.ok().body("Deleted.");
                     } else {
@@ -183,7 +183,7 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

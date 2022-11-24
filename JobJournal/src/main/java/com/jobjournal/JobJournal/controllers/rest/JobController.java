@@ -59,7 +59,7 @@ public class JobController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         return ResponseEntity.ok()
                                 .body(this.jobServices.getRepository().getJobByPostId(postId));
                     } else {
@@ -72,7 +72,7 @@ public class JobController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -87,10 +87,10 @@ public class JobController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         // The client does not include the Post attribute in the request body, so it
                         // must be manually added
-                        job.setPost(post.get());
+                        job.set_post(post.get());
                         return ResponseEntity.ok().body(this.jobServices.getRepository().save(job));
                     } else {
                         throw new UserIdDoesNotMatchException();
@@ -104,9 +104,9 @@ public class JobController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -121,16 +121,16 @@ public class JobController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         Optional<Job> dbJob = this.jobServices.getRepository().getJobByPostId(postId);
                         dbJob.map(j -> {
-                            j.setTitle(job.getTitle());
-                            j.setInformation(job.getInformation());
-                            j.setLocation(job.getLocation());
-                            j.setTypeEnum(job.getTypeEnum());
-                            j.setStatusEnum(job.getStatusEnum());
-                            j.setApplicationDate(job.getApplicationDate());
-                            j.setApplicationDismissedDate(job.getApplicationDismissedDate());
+                            j.set_job_title(job.get_job_title());
+                            j.set_job_information(job.get_job_information());
+                            j.set_job_location(job.get_job_location());
+                            j.set_job_type(job.get_job_type());
+                            j.set_job_status(job.get_job_status());
+                            j.set_job_application_submitted_date(job.get_job_application_submitted_date());
+                            j.set_job_application_dismissed_date(job.get_job_application_dismissed_date());
 
                             return this.jobServices.getRepository().save(j);
                         });
@@ -148,9 +148,9 @@ public class JobController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -165,7 +165,7 @@ public class JobController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> post = this.postServices.getRepository().findById(postId);
                 if (post.isPresent()) {
-                    if (userId.get() == post.get().getUser().getId()) {
+                    if (userId.get() == post.get().get_user().get_user_id()) {
                         this.jobServices.getRepository().deleteJobByPostId(postId);
                         return ResponseEntity.ok().body("Deleted.");
                     } else {
@@ -178,7 +178,7 @@ public class JobController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

@@ -45,7 +45,7 @@ public class UsersController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -58,9 +58,9 @@ public class UsersController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException ie) {
             return ResponseEntity.badRequest().body("Auth0 Id cannot be null.");
         } catch (OptimisticLockingFailureException ofe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ofe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ofe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -81,7 +81,7 @@ public class UsersController extends RequiredAbstractClassForControllers {
             // profile and setting information back to db and return error.
             return ResponseEntity.ok().body(null);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ public class UsersController extends RequiredAbstractClassForControllers {
         try {
             return ResponseEntity.ok().body(token);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

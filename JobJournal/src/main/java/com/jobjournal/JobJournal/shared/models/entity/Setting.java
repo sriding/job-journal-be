@@ -9,68 +9,64 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "SETTING")
 public class Setting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "setting_id")
-    private Long id;
+    private Long _setting_id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private Users user;
+    @JoinColumn(name = "_user_id", nullable = false, unique = true)
+    private Users _user;
 
     @CreationTimestamp
-    @Column(name = "creation_date", updatable = false)
-    private Date dateCreated;
+    @Column(updatable = false)
+    private Date _creation_date;
 
     @UpdateTimestamp
-    @Column(name = "update_date")
-    private Date dateUpdated;
+    private Date _update_date;
 
     // no-arg constructor required for entity object
     public Setting() {
     }
 
     public Setting(Users user) {
-        this.user = user;
+        this._user = user;
     }
 
-    public Long getId() {
-        return id;
+    public Long get_setting_id() {
+        return _setting_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void set_setting_id(Long _setting_id) {
+        this._setting_id = _setting_id;
     }
 
-    public Users getUser() {
-        return user;
+    public Users get_user() {
+        return _user;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    public void set_user(Users _user) {
+        this._user = _user;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public Date get_creation_date() {
+        return _creation_date;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public void set_creation_date(Date _creation_date) {
+        this._creation_date = _creation_date;
     }
 
-    public Date getDateUpdated() {
-        return dateUpdated;
+    public Date get_update_date() {
+        return _update_date;
     }
 
-    public void setDateUpdated(Date dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void set_update_date(Date _update_date) {
+        this._update_date = _update_date;
     }
 }

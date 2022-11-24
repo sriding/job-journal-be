@@ -64,7 +64,7 @@ public class PostController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -75,11 +75,12 @@ public class PostController extends RequiredAbstractClassForControllers {
     public ResponseEntity<?> createPostByToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
             @RequestBody Post post) {
         try {
+            System.out.println(post);
             Optional<Users> user = getUserByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (user.isPresent()) {
                 // Post in request body does not have User attribute set, so it must be manually
                 // set
-                post.setUser(user.get());
+                post.set_user(user.get());
                 return ResponseEntity.ok().body(this.postServices.getRepository()
                         .save(this.postServices.getRepository().save(post)));
             } else {
@@ -88,9 +89,9 @@ public class PostController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -105,9 +106,9 @@ public class PostController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 Optional<Post> dbPost = this.postServices.getRepository().findById(postId);
                 if (dbPost.isPresent()) {
-                    if (userId.get() == dbPost.get().getUser().getId()) {
+                    if (userId.get() == dbPost.get().get_user().get_user_id()) {
                         dbPost.map(p -> {
-                            p.setNotes(post.getNotes());
+                            p.set_post_notes(post.get_post_notes());
 
                             return this.postServices.getRepository().save(p);
                         });
@@ -125,9 +126,9 @@ public class PostController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -146,7 +147,7 @@ public class PostController extends RequiredAbstractClassForControllers {
             // return error
             return ResponseEntity.ok().body(null);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

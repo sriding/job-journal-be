@@ -9,39 +9,31 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "COMPANY")
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "company_id")
-    private Long id;
+    private Long _company_id;
 
     @OneToOne
-    @JoinColumn(name = "post_id", nullable = false, unique = true)
-    private Post post;
+    @JoinColumn(name = "_post_id", nullable = false, unique = true)
+    private Post _post;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "website")
-    private String website;
-
-    @Column(name = "information")
-    private String information;
+    @Column(nullable = false)
+    private String _company_name;
+    private String _company_website;
+    private String _company_information;
 
     @CreationTimestamp
-    @Column(name = "creation_date", updatable = false)
-    private Date dateCreated;
+    @Column(updatable = false)
+    private Date _creation_date;
 
     @UpdateTimestamp
-    @Column(name = "update_date")
-    private Date dateUpdated;
+    private Date _update_date;
 
     // no-arg constructor required for entity object
     public Company() {
@@ -49,56 +41,72 @@ public class Company {
 
     // If this constructor is used, the post will need to be set manually after
     // intialization
-    public Company(String name, String website, String information) {
-        this.name = name;
-        this.website = website;
-        this.information = information;
+    public Company(String _company_name, String _company_website, String _company_information) {
+        this._company_name = _company_name;
+        this._company_website = _company_website;
+        this._company_information = _company_information;
     }
 
-    public Company(Post post, String name, String website, String information) {
-        this.post = post;
-        this.name = name;
-        this.website = website;
-        this.information = information;
+    public Company(Post post, String _company_name, String _company_website, String _company_information) {
+        this._post = post;
+        this._company_name = _company_name;
+        this._company_website = _company_website;
+        this._company_information = _company_information;
     }
 
-    public Long getId() {
-        return id;
+    public Long get_company_id() {
+        return _company_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void set_company_id(Long _company_id) {
+        this._company_id = _company_id;
     }
 
-    public Post getPost() {
-        return post;
+    public Post get_post() {
+        return _post;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void set_post(Post _post) {
+        this._post = _post;
     }
 
-    public String getName() {
-        return name;
+    public String get_company_name() {
+        return _company_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void set_company_name(String _company_name) {
+        this._company_name = _company_name;
     }
 
-    public String getWebsite() {
-        return website;
+    public String get_company_website() {
+        return _company_website;
     }
 
-    public void setWebsite(String website) {
-        this.website = website;
+    public void set_company_website(String _company_website) {
+        this._company_website = _company_website;
     }
 
-    public String getInformation() {
-        return information;
+    public String get_company_information() {
+        return _company_information;
     }
 
-    public void setInformation(String information) {
-        this.information = information;
+    public void set_company_information(String _company_information) {
+        this._company_information = _company_information;
+    }
+
+    public Date get_creation_date() {
+        return _creation_date;
+    }
+
+    public void set_creation_date(Date _creation_date) {
+        this._creation_date = _creation_date;
+    }
+
+    public Date get_update_date() {
+        return _update_date;
+    }
+
+    public void set_update_date(Date _update_date) {
+        this._update_date = _update_date;
     }
 }

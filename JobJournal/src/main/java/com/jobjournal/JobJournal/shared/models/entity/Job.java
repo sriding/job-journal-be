@@ -1,67 +1,42 @@
 package com.jobjournal.JobJournal.shared.models.entity;
 
 import java.sql.Date;
-import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.jobjournal.JobJournal.shared.enums.JobStatus;
-import com.jobjournal.JobJournal.shared.enums.JobType;
-
 @Entity
-@Table(name = "JOB")
 public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "job_id")
-    private Long id;
-
+    private Long _job_id;
     @OneToOne
-    @JoinColumn(name = "post_id", nullable = false, unique = true)
-    private Post post;
+    @JoinColumn(name = "_post_id", nullable = false, unique = true)
+    private Post _post;
 
-    @Column(name = "title", nullable = false)
-    private String title;
-
-    @Column(name = "information")
-    private String information;
-
-    @Column(name = "location")
-    private String location;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private JobType typeEnum;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private JobStatus statusEnum;
-
-    @Column(name = "application_submitted_date", columnDefinition = "DATE")
-    private LocalDate applicationDate;
-
-    @Column(name = "application_dismissed_date", columnDefinition = "DATE")
-    private LocalDate applicationDismissedDate;
+    @Column(nullable = false)
+    private String _job_title;
+    private String _job_information;
+    private String _job_location;
+    private String _job_type;
+    private String _job_status;
+    private String _job_application_submitted_date;
+    private String _job_application_dismissed_date;
 
     @CreationTimestamp
-    @Column(name = "creation_date", updatable = false)
-    private Date dateCreated;
+    @Column(updatable = false)
+    private Date _creation_date;
 
     @UpdateTimestamp
-    @Column(name = "update_date")
-    private Date dateUpdated;
+    private Date _update_date;
 
     // no-arg constructor required for entity object
     public Job() {
@@ -69,114 +44,115 @@ public class Job {
 
     // If this constructor is used, a post field must be set manually after
     // intialization
-    public Job(String title, String information, String location, String type, String status,
-            LocalDate applicationDate, LocalDate applicationDismissedDate) throws Exception {
-        this.title = title;
-        this.information = information;
-        this.location = location;
-        this.typeEnum = JobType.valueOf(type);
-        this.statusEnum = JobStatus.valueOf(status);
-        this.applicationDate = applicationDate;
-        this.applicationDismissedDate = applicationDismissedDate;
+    public Job(String _job_title, String _job_information, String _job_location, String _job_type, String _job_status,
+            String _job_application_submitted_date, String _job_application_dismissed_date) throws Exception {
+        this._job_title = _job_title;
+        this._job_information = _job_information;
+        this._job_location = _job_location;
+        this._job_type = _job_type;
+        this._job_status = _job_status;
+        this._job_application_submitted_date = _job_application_submitted_date;
+        this._job_application_dismissed_date = _job_application_dismissed_date;
     }
 
-    public Job(Post post, String title, String information, String location, String type, String status,
-            LocalDate applicationDate, LocalDate applicationDismissedDate) throws Exception {
-        this.post = post;
-        this.title = title;
-        this.information = information;
-        this.location = location;
-        this.typeEnum = JobType.valueOf(type);
-        this.statusEnum = JobStatus.valueOf(status);
-        this.applicationDate = applicationDate;
-        this.applicationDismissedDate = applicationDismissedDate;
+    public Job(Post post, String _job_title, String _job_information, String _job_location, String _job_type,
+            String _job_status,
+            String _job_application_submitted_date, String _job_application_dismissed_date) throws Exception {
+        this._post = post;
+        this._job_title = _job_title;
+        this._job_information = _job_information;
+        this._job_location = _job_location;
+        this._job_type = _job_type;
+        this._job_status = _job_status;
+        this._job_application_submitted_date = _job_application_submitted_date;
+        this._job_application_dismissed_date = _job_application_dismissed_date;
     }
 
-    public Long getId() {
-        return id;
+    public Long get_job_id() {
+        return _job_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void set_job_id(Long _job_id) {
+        this._job_id = _job_id;
     }
 
-    public Post getPost() {
-        return post;
+    public Post get_post() {
+        return _post;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
+    public void set_post(Post _post) {
+        this._post = _post;
     }
 
-    public String getTitle() {
-        return title;
+    public String get_job_title() {
+        return _job_title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void set_job_title(String _job_title) {
+        this._job_title = _job_title;
     }
 
-    public String getInformation() {
-        return information;
+    public String get_job_information() {
+        return _job_information;
     }
 
-    public void setInformation(String information) {
-        this.information = information;
+    public void set_job_information(String _job_information) {
+        this._job_information = _job_information;
     }
 
-    public String getLocation() {
-        return location;
+    public String get_job_location() {
+        return _job_location;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void set_job_location(String _job_location) {
+        this._job_location = _job_location;
     }
 
-    public JobType getTypeEnum() {
-        return typeEnum;
+    public String get_job_type() {
+        return _job_type;
     }
 
-    public void setTypeEnum(JobType typeEnum) {
-        this.typeEnum = typeEnum;
+    public void set_job_type(String _job_type) {
+        this._job_type = _job_type;
     }
 
-    public JobStatus getStatusEnum() {
-        return statusEnum;
+    public String get_job_status() {
+        return _job_status;
     }
 
-    public void setStatusEnum(JobStatus statusEnum) {
-        this.statusEnum = statusEnum;
+    public void set_job_status(String _job_status) {
+        this._job_status = _job_status;
     }
 
-    public LocalDate getApplicationDate() {
-        return applicationDate;
+    public String get_job_application_submitted_date() {
+        return _job_application_submitted_date;
     }
 
-    public void setApplicationDate(LocalDate applicationDate) {
-        this.applicationDate = applicationDate;
+    public void set_job_application_submitted_date(String _job_application_submitted_date) {
+        this._job_application_submitted_date = _job_application_submitted_date;
     }
 
-    public LocalDate getApplicationDismissedDate() {
-        return applicationDismissedDate;
+    public String get_job_application_dismissed_date() {
+        return _job_application_dismissed_date;
     }
 
-    public void setApplicationDismissedDate(LocalDate applicationDismissedDate) {
-        this.applicationDismissedDate = applicationDismissedDate;
+    public void set_job_application_dismissed_date(String _job_application_dismissed_date) {
+        this._job_application_dismissed_date = _job_application_dismissed_date;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public Date get_creation_date() {
+        return _creation_date;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public void set_creation_date(Date _creation_date) {
+        this._creation_date = _creation_date;
     }
 
-    public Date getDateUpdated() {
-        return dateUpdated;
+    public Date get_update_date() {
+        return _update_date;
     }
 
-    public void setDateUpdated(Date dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void set_update_date(Date _update_date) {
+        this._update_date = _update_date;
     }
 }

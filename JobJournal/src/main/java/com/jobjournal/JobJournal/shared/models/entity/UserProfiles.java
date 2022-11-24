@@ -15,74 +15,72 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "USERPROFILES")
+@Table(name = "userprofiles")
 public class UserProfiles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "profile_id")
-    private Long id;
+    private Long _profile_id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private Users user;
+    @JoinColumn(name = "_user_id", nullable = false, unique = true)
+    private Users _user;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(nullable = false)
+    private String _profile_name;
 
     @CreationTimestamp
-    @Column(name = "creation_date", updatable = false)
-    private Date dateCreated;
+    @Column(updatable = false)
+    private Date _creation_date;
 
     @UpdateTimestamp
-    @Column(name = "update_date")
-    private Date dateUpdated;
+    private Date _update_date;
 
     // no arg constructor required for entity object
     public UserProfiles() {
     }
 
-    public UserProfiles(Users user, String name) {
-        this.user = user;
-        this.name = name;
+    public UserProfiles(Users _user, String _profile_name) {
+        this._user = _user;
+        this._profile_name = _profile_name;
     }
 
-    public Long getId() {
-        return id;
+    public Long get_profile_id() {
+        return _profile_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void set_profile_id(Long _profile_id) {
+        this._profile_id = _profile_id;
     }
 
-    public Users getUser() {
-        return user;
+    public Users get_user() {
+        return _user;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    public void set_user(Users _user) {
+        this._user = _user;
     }
 
-    public String getName() {
-        return name;
+    public String get_profile_name() {
+        return _profile_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void set_profile_name(String _profile_name) {
+        this._profile_name = _profile_name;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public Date get_creation_date() {
+        return _creation_date;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public void set_creation_date(Date _creation_date) {
+        this._creation_date = _creation_date;
     }
 
-    public Date getDateUpdated() {
-        return dateUpdated;
+    public Date get_update_date() {
+        return _update_date;
     }
 
-    public void setDateUpdated(Date dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void set_update_date(Date _update_date) {
+        this._update_date = _update_date;
     }
 }

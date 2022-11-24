@@ -11,39 +11,34 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "POST")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
-    private Long id;
+    private Long _post_id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "_user_id", nullable = false)
+    private Users _user;
 
-    @Column(name = "Notes")
-    private String notes;
+    private String _post_notes;
 
     @CreationTimestamp
-    @Column(name = "creation_date", updatable = false)
-    private Date dateCreated;
+    @Column(updatable = false)
+    private Date _creation_date;
 
     @UpdateTimestamp
-    @Column(name = "update_date")
-    private Date dateUpdated;
+    private Date _update_date;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
-    private Company company;
+    @OneToOne(mappedBy = "_post", cascade = CascadeType.ALL)
+    private Company _company;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
-    private Job job;
+    @OneToOne(mappedBy = "_post", cascade = CascadeType.ALL)
+    private Job _job;
 
     // no-arg constructor required for entity object
     public Post() {
@@ -51,52 +46,52 @@ public class Post {
 
     // If this constructor is used, the user field must be set manually after
     // initalization
-    public Post(String notes) {
-        this.notes = notes;
+    public Post(String _post_notes) {
+        this._post_notes = _post_notes;
     }
 
-    public Post(Users user, String notes) {
-        this.user = user;
-        this.notes = notes;
+    public Post(Users _user, String _post_notes) {
+        this._user = _user;
+        this._post_notes = _post_notes;
     }
 
-    public Long getId() {
-        return id;
+    public Long get_post_id() {
+        return _post_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void set_post_id(Long _post_id) {
+        this._post_id = _post_id;
     }
 
-    public Users getUser() {
-        return user;
+    public Users get_user() {
+        return _user;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    public void set_user(Users _user) {
+        this._user = _user;
     }
 
-    public String getNotes() {
-        return notes;
+    public String get_post_notes() {
+        return _post_notes;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void set_post_notes(String _post_notes) {
+        this._post_notes = _post_notes;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public Date get_creation_date() {
+        return _creation_date;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public void set_creation_date(Date _creation_date) {
+        this._creation_date = _creation_date;
     }
 
-    public Date getDateUpdated() {
-        return dateUpdated;
+    public Date get_update_date() {
+        return _update_date;
     }
 
-    public void setDateUpdated(Date dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void set_update_date(Date _update_date) {
+        this._update_date = _update_date;
     }
 }

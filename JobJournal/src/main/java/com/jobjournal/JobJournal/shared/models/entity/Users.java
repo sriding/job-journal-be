@@ -11,76 +11,72 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "USERS")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
+    private Long _user_id;
 
-    @Column(name = "auth0_id", unique = true, nullable = false)
-    private String auth0Id;
+    @Column(unique = true, nullable = false)
+    private String _auth0_id;
 
     @CreationTimestamp
-    @Column(name = "creation_date", updatable = false)
-    private Date dateCreated;
+    @Column(updatable = false)
+    private Date _creation_date;
 
     @UpdateTimestamp
-    @Column(name = "update_date")
-    private Date dateUpdated;
+    private Date _update_date;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Setting setting;
+    @OneToOne(mappedBy = "_user", cascade = CascadeType.ALL)
+    private Setting _setting;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private UserProfiles profile;
+    @OneToOne(mappedBy = "_user", cascade = CascadeType.ALL)
+    private UserProfiles _profile;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Post> posts;
+    @OneToMany(mappedBy = "_user", cascade = CascadeType.ALL)
+    private Set<Post> _posts;
 
     // no-arg constructor required for entity object
     public Users() {
     }
 
-    public Users(String auth0Id) {
-        this.auth0Id = auth0Id;
+    public Users(String _auth0_id) {
+        this._auth0_id = _auth0_id;
     }
 
-    public Long getId() {
-        return id;
+    public Long get_user_id() {
+        return _user_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void set_user_id(Long _user_id) {
+        this._user_id = _user_id;
     }
 
-    public String getAuth0Id() {
-        return auth0Id;
+    public String get_auth0_id() {
+        return _auth0_id;
     }
 
-    public void setAuth0Id(String auth0Id) {
-        this.auth0Id = auth0Id;
+    public void set_auth0_id(String _auth0_id) {
+        this._auth0_id = _auth0_id;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public Date get_creation_date() {
+        return _creation_date;
     }
 
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+    public void set_creation_date(Date _creation_date) {
+        this._creation_date = _creation_date;
     }
 
-    public Date getDateUpdated() {
-        return dateUpdated;
+    public Date get_update_date() {
+        return _update_date;
     }
 
-    public void setDateUpdated(Date dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void set_update_date(Date _update_date) {
+        this._update_date = _update_date;
     }
 }

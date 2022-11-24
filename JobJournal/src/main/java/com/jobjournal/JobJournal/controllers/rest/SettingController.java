@@ -51,7 +51,7 @@ public class SettingController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -68,9 +68,9 @@ public class SettingController extends RequiredAbstractClassForControllers {
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.badRequest().body("Null value is invalidating request.");
         } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -86,7 +86,7 @@ public class SettingController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
