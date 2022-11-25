@@ -20,7 +20,7 @@ public class Company {
     private Long _company_id;
 
     @OneToOne
-    @JoinColumn(name = "_post_id", nullable = false, unique = true)
+    @JoinColumn(name = "_post_id_fk_company", referencedColumnName = "_post_id", nullable = false, unique = true)
     private Post _post;
 
     @Column(nullable = false)
@@ -30,10 +30,10 @@ public class Company {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private Date _creation_date;
+    private Date _company_creation_date;
 
     @UpdateTimestamp
-    private Date _update_date;
+    private Date _company_update_date;
 
     // no-arg constructor required for entity object
     public Company() {
@@ -94,19 +94,19 @@ public class Company {
         this._company_information = _company_information;
     }
 
-    public Date get_creation_date() {
-        return _creation_date;
+    public Date get_company_creation_date() {
+        return _company_creation_date;
     }
 
-    public void set_creation_date(Date _creation_date) {
-        this._creation_date = _creation_date;
+    public void set_company_creation_date(Date _company_creation_date) {
+        this._company_creation_date = _company_creation_date;
     }
 
-    public Date get_update_date() {
-        return _update_date;
+    public Date get_company_update_date() {
+        return _company_update_date;
     }
 
-    public void set_update_date(Date _update_date) {
-        this._update_date = _update_date;
+    public void set_company_update_date(Date _company_update_date) {
+        this._company_update_date = _company_update_date;
     }
 }

@@ -12,11 +12,11 @@ import com.jobjournal.JobJournal.shared.models.entity.UserProfiles;
 
 @Transactional
 public interface UserProfilesRepository extends JpaRepository<UserProfiles, Long> {
-    @Query(value = "SELECT * FROM userprofiles WHERE _user_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM userprofiles WHERE _user_id_fk_profile = ?1", nativeQuery = true)
     Optional<UserProfiles> findUserProfileByUserId(Long _user_id);
 
     @Modifying
-    @Query(value = "DELETE FROM userprofiles where _user_id = ?1", nativeQuery = true)
+    @Query(value = "DELETE FROM userprofiles WHERE _user_id_fk_profile = ?1", nativeQuery = true)
     void deleteUserProfileByUserId(Long _user_id);
 
 }

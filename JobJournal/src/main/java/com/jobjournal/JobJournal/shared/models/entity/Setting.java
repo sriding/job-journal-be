@@ -20,15 +20,15 @@ public class Setting {
     private Long _setting_id;
 
     @OneToOne
-    @JoinColumn(name = "_user_id", nullable = false, unique = true)
+    @JoinColumn(name = "_user_id_fk_setting", referencedColumnName = "_user_id", nullable = false, unique = true)
     private Users _user;
 
     @CreationTimestamp
     @Column(updatable = false)
-    private Date _creation_date;
+    private Date _setting_creation_date;
 
     @UpdateTimestamp
-    private Date _update_date;
+    private Date _setting_update_date;
 
     // no-arg constructor required for entity object
     public Setting() {
@@ -54,19 +54,19 @@ public class Setting {
         this._user = _user;
     }
 
-    public Date get_creation_date() {
-        return _creation_date;
+    public Date get_setting_creation_date() {
+        return _setting_creation_date;
     }
 
-    public void set_creation_date(Date _creation_date) {
-        this._creation_date = _creation_date;
+    public void set_setting_creation_date(Date _setting_creation_date) {
+        this._setting_creation_date = _setting_creation_date;
     }
 
-    public Date get_update_date() {
-        return _update_date;
+    public Date get_setting_update_date() {
+        return _setting_update_date;
     }
 
-    public void set_update_date(Date _update_date) {
-        this._update_date = _update_date;
+    public void set_setting_update_date(Date _setting_update_date) {
+        this._setting_update_date = _setting_update_date;
     }
 }

@@ -68,6 +68,24 @@ public class PostController extends RequiredAbstractClassForControllers {
         }
     }
 
+    @GetMapping(path = "/get/posts/with/company/and/job/by/token/{indexLimit}")
+    public ResponseEntity<?> getPostsWithCompaniesWithJobsByToken(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+            @PathVariable int indexLimit) {
+        try {
+            Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
+            if (userId.isPresent()) {
+                return ResponseEntity.ok()
+                        .body(this.postServices.getRepository().getPostsWithCompaniesWithJobs(userId.get(), indexLimit,
+                                indexLimit + GET_POSTS_LIMIT));
+            } else {
+                throw new UserIdNotFoundException();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     // TODO: More GET methods to account for filtering
 
     // Create a post using token and post object from request body

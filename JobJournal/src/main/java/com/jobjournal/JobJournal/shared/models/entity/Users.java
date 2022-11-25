@@ -26,10 +26,10 @@ public class Users {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private Date _creation_date;
+    private Date _user_creation_date;
 
     @UpdateTimestamp
-    private Date _update_date;
+    private Date _user_update_date;
 
     @OneToOne(mappedBy = "_user", cascade = CascadeType.ALL)
     private Setting _setting;
@@ -64,19 +64,19 @@ public class Users {
         this._auth0_id = _auth0_id;
     }
 
-    public Date get_creation_date() {
-        return _creation_date;
+    public Date get_user_creation_date() {
+        return _user_creation_date;
     }
 
-    public void set_creation_date(Date _creation_date) {
-        this._creation_date = _creation_date;
+    public void set_user_creation_date(Date _user_creation_date) {
+        this._user_creation_date = _user_creation_date;
     }
 
-    public Date get_update_date() {
-        return _update_date;
+    public Date get_user_update_date() {
+        return _user_update_date;
     }
 
-    public void set_update_date(Date _update_date) {
-        this._update_date = _update_date;
+    public void set_user_update_date(Date _user_update_date) {
+        this._user_update_date = _user_update_date;
     }
 }

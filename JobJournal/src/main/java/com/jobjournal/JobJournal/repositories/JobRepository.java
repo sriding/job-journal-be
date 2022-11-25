@@ -12,10 +12,10 @@ import com.jobjournal.JobJournal.shared.models.entity.Job;
 
 @Transactional
 public interface JobRepository extends JpaRepository<Job, Long> {
-    @Query(value = "SELECT * FROM job WHERE _post_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM job WHERE _post_id_fk_job = ?1", nativeQuery = true)
     Optional<Job> getJobByPostId(Long _post_id);
 
     @Modifying
-    @Query(value = "DELETE FROM job WHERE _post_id = ?1", nativeQuery = true)
+    @Query(value = "DELETE FROM job WHERE _post_id_fk_job = ?1", nativeQuery = true)
     void deleteJobByPostId(Long _post_id);
 }
