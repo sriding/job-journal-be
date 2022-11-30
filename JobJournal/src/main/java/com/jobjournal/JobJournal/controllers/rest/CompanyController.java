@@ -1,11 +1,10 @@
 package com.jobjournal.JobJournal.controllers.rest;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +28,7 @@ import com.jobjournal.JobJournal.repositories.UsersRepository;
 import com.jobjournal.JobJournal.services.CompanyServices;
 import com.jobjournal.JobJournal.services.PostServices;
 import com.jobjournal.JobJournal.services.UsersServices;
+import com.jobjournal.JobJournal.shared.datastructures.ResponsePayloadHashMap;
 import com.jobjournal.JobJournal.shared.models.entity.Company;
 import com.jobjournal.JobJournal.shared.models.entity.Post;
 
@@ -62,8 +62,13 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 Optional<Post> post = this.postsServices.getRepository().findById(postId);
                 if (post.isPresent()) {
                     if (userId.get() == post.get().get_user().get_user_id()) {
-                        return ResponseEntity.ok()
-                                .body(this.companyServices.getRepository().findCompanyByPostId(postId));
+                        Optional<Company> company = this.companyServices.getRepository().findCompanyByPostId(postId);
+                        if (company.isPresent()) {
+                            return ResponseEntity.ok()
+                                    .body(new ResponsePayloadHashMap(true, "", company).getResponsePayloadHashMap());
+                        } else {
+                            throw new CompanyNotFoundException();
+                        }
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -74,7 +79,8 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 
@@ -95,7 +101,9 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                         // The requester does not pass in a post attribute for the company, so it must
                         // be added manually.
                         company.set_post(post.get());
-                        return ResponseEntity.ok().body(this.companyServices.getRepository().save(company));
+                        Company newCompany = this.companyServices.getRepository().save(company);
+                        return ResponseEntity.ok()
+                                .body(new ResponsePayloadHashMap(true, "", newCompany).getResponsePayloadHashMap());
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -105,12 +113,9 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.badRequest().body("Null value is invalidating request.");
-        } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 
@@ -137,7 +142,8 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                                 return this.companyServices.getRepository().save(c);
                             });
 
-                            return ResponseEntity.ok().body(company);
+                            return ResponseEntity.ok()
+                                    .body(new ResponsePayloadHashMap(true, "", dbCompany).getResponsePayloadHashMap());
                         } else {
                             throw new CompanyNotFoundException();
                         }
@@ -150,12 +156,9 @@ public class CompanyController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.badRequest().body("Null value is invalidating request.");
-        } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 
@@ -172,7 +175,9 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 if (post.isPresent()) {
                     if (userId.get() == post.get().get_user().get_user_id()) {
                         this.companyServices.getRepository().deleteCompanyByPostId(postId);
-                        return ResponseEntity.ok().body("Deleted.");
+                        return ResponseEntity.ok()
+                                .body(new ResponsePayloadHashMap(true, "Company succesfully deleted.", null)
+                                        .getResponsePayloadHashMap());
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -183,7 +188,8 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 

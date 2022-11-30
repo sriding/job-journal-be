@@ -34,8 +34,8 @@ public class Setting {
     public Setting() {
     }
 
-    public Setting(Users user) {
-        this._user = user;
+    public Setting(Users _user) {
+        this._user = _user;
     }
 
     public Long get_setting_id() {

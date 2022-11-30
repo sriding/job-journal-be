@@ -55,10 +55,10 @@ public class Job {
         this._job_application_dismissed_date = _job_application_dismissed_date;
     }
 
-    public Job(Post post, String _job_title, String _job_information, String _job_location, String _job_type,
+    public Job(Post _post, String _job_title, String _job_information, String _job_location, String _job_type,
             String _job_status,
             String _job_application_submitted_date, String _job_application_dismissed_date) throws Exception {
-        this._post = post;
+        this._post = _post;
         this._job_title = _job_title;
         this._job_information = _job_information;
         this._job_location = _job_location;

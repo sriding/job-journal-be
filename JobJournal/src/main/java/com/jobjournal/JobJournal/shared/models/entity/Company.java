@@ -47,8 +47,8 @@ public class Company {
         this._company_information = _company_information;
     }
 
-    public Company(Post post, String _company_name, String _company_website, String _company_information) {
-        this._post = post;
+    public Company(Post _post, String _company_name, String _company_website, String _company_information) {
+        this._post = _post;
         this._company_name = _company_name;
         this._company_website = _company_website;
         this._company_information = _company_information;

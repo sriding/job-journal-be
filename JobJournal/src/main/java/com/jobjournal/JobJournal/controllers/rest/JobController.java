@@ -1,5 +1,6 @@
 package com.jobjournal.JobJournal.controllers.rest;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
+import com.jobjournal.JobJournal.exceptions.handlers.JobNotFoundException;
 import com.jobjournal.JobJournal.exceptions.handlers.PostNotFoundException;
 import com.jobjournal.JobJournal.exceptions.handlers.UserIdDoesNotMatchException;
 import com.jobjournal.JobJournal.exceptions.handlers.UserIdNotFoundException;
@@ -28,6 +30,7 @@ import com.jobjournal.JobJournal.repositories.UsersRepository;
 import com.jobjournal.JobJournal.services.JobServices;
 import com.jobjournal.JobJournal.services.PostServices;
 import com.jobjournal.JobJournal.services.UsersServices;
+import com.jobjournal.JobJournal.shared.datastructures.ResponsePayloadHashMap;
 import com.jobjournal.JobJournal.shared.models.entity.Job;
 import com.jobjournal.JobJournal.shared.models.entity.Post;
 
@@ -60,8 +63,14 @@ public class JobController extends RequiredAbstractClassForControllers {
                 Optional<Post> post = this.postServices.getRepository().findById(postId);
                 if (post.isPresent()) {
                     if (userId.get() == post.get().get_user().get_user_id()) {
-                        return ResponseEntity.ok()
-                                .body(this.jobServices.getRepository().getJobByPostId(postId));
+                        Optional<Job> job = this.jobServices.getRepository().getJobByPostId(postId);
+                        if (job.isPresent()) {
+                            return ResponseEntity.ok()
+                                    .body(new ResponsePayloadHashMap(true, "", job).getResponsePayloadHashMap());
+
+                        } else {
+                            throw new JobNotFoundException();
+                        }
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -72,7 +81,8 @@ public class JobController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 
@@ -91,7 +101,9 @@ public class JobController extends RequiredAbstractClassForControllers {
                         // The client does not include the Post attribute in the request body, so it
                         // must be manually added
                         job.set_post(post.get());
-                        return ResponseEntity.ok().body(this.jobServices.getRepository().save(job));
+                        Job newJob = this.jobServices.getRepository().save(job);
+                        return ResponseEntity.ok()
+                                .body(new ResponsePayloadHashMap(true, "", newJob).getResponsePayloadHashMap());
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -101,12 +113,9 @@ public class JobController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.badRequest().body("Null value is invalidating request.");
-        } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 
@@ -135,7 +144,8 @@ public class JobController extends RequiredAbstractClassForControllers {
                             return this.jobServices.getRepository().save(j);
                         });
 
-                        return ResponseEntity.ok().body(job);
+                        return ResponseEntity.ok()
+                                .body(new ResponsePayloadHashMap(true, "", dbJob).getResponsePayloadHashMap());
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -145,12 +155,9 @@ public class JobController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.badRequest().body("Null value is invalidating request.");
-        } catch (OptimisticLockingFailureException olfe) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(olfe.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 
@@ -167,7 +174,9 @@ public class JobController extends RequiredAbstractClassForControllers {
                 if (post.isPresent()) {
                     if (userId.get() == post.get().get_user().get_user_id()) {
                         this.jobServices.getRepository().deleteJobByPostId(postId);
-                        return ResponseEntity.ok().body("Deleted.");
+                        return ResponseEntity.ok()
+                                .body(new ResponsePayloadHashMap(true, "Job successfully deleted.", null)
+                                        .getResponsePayloadHashMap());
                     } else {
                         throw new UserIdDoesNotMatchException();
                     }
@@ -178,7 +187,8 @@ public class JobController extends RequiredAbstractClassForControllers {
                 throw new UserIdNotFoundException();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
     }
 }

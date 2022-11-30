@@ -15,7 +15,10 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query(value = "SELECT * FROM company WHERE _post_id_fk_company = ?1", nativeQuery = true)
     Optional<Company> findCompanyByPostId(Long _post_id);
 
+    @Query(value = "SELECT _company_id FROM company WHERE _post_id_fk_company = ?1", nativeQuery = true)
+    Optional<Long> findCompanyIdByPostId(Long _post_id);
+
     @Modifying
     @Query(value = "DELETE FROM company WHERE _post_id_fk_company = ?1", nativeQuery = true)
-    void deleteCompanyByPostId(Long _post_id);
+    int deleteCompanyByPostId(Long _post_id);
 }

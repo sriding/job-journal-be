@@ -1,6 +1,6 @@
-package com.jobjournal.JobJournal.shared.interfaces.projection;
+package com.jobjournal.JobJournal.shared.interfaces;
 
-public interface PostsWithCompaniesAndJobsQuery {
+public interface PostsWithCompaniesAndJobsInterface {
     Long get_post_id();
 
     String get_post_notes();
