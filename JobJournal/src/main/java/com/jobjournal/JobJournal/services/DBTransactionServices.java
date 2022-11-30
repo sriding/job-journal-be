@@ -44,9 +44,9 @@ public class DBTransactionServices {
 
     @Transactional
     public void deletePostWithCompanyWithJob(Long postId, Long companyId, Long jobId) {
-        this.postRepository.deleteById(postId);
         this.companyRepository.deleteById(companyId);
         this.jobRepository.deleteById(jobId);
+        this.postRepository.deleteById(postId);
     }
 
     @Transactional

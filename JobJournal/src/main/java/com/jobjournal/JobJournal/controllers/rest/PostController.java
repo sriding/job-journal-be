@@ -1,7 +1,6 @@
 package com.jobjournal.JobJournal.controllers.rest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,16 +88,33 @@ public class PostController extends RequiredAbstractClassForControllers {
         }
     }
 
-    @GetMapping(path = "/get/posts/with/company/and/job/by/token/{indexLimit}")
+    @GetMapping(path = "/get/posts/with/company/and/job/by/token")
     public ResponseEntity<?> getPostsWithCompaniesWithJobsByToken(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable int indexLimit) {
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
                 ArrayList<PostsWithCompaniesAndJobsInterface> pCJArrayList = this.postServices.getRepository()
-                        .getPostsWithCompaniesWithJobs(userId.get(), indexLimit,
-                                indexLimit + GET_POSTS_LIMIT);
+                        .getPostsWithCompaniesWithJobsNoStartingIndex(userId.get());
+                return ResponseEntity.ok()
+                        .body(new ResponsePayloadHashMap(true, "", pCJArrayList).getResponsePayloadHashMap());
+            } else {
+                throw new UserIdNotFoundException();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
+        }
+    }
+
+    @GetMapping(path = "/get/posts/with/company/and/job/by/token/{postId}")
+    public ResponseEntity<?> getPostsWithCompaniesWithJobsByTokenWithStartingIndex(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long postId) {
+        try {
+            Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
+            if (userId.isPresent()) {
+                ArrayList<PostsWithCompaniesAndJobsInterface> pCJArrayList = this.postServices.getRepository()
+                        .getPostsWithCompaniesWithJobsWithStartingIndex(userId.get(), postId);
                 return ResponseEntity.ok()
                         .body(new ResponsePayloadHashMap(true, "", pCJArrayList).getResponsePayloadHashMap());
             } else {
