@@ -126,7 +126,24 @@ public class PostController extends RequiredAbstractClassForControllers {
         }
     }
 
-    // TODO: More GET methods to account for filtering
+    @GetMapping(path = "/get/posts/with/company/and/job/by/token/{postId}/filtered/by/{text}")
+    public ResponseEntity<?> getPostsWithCompaniesWithJobsByTokenWithStartingIndexFilteredByText(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long postId,
+            @PathVariable String text) {
+        try {
+            Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
+            if (userId.isPresent()) {
+                ArrayList<PostsWithCompaniesAndJobsInterface> pcjArrayList = this.postServices.getRepository()
+                        .getPostsWithCompaniesWithJobsWithStartingIndexAndWithFilter(userId.get(), postId, text);
+                return ResponseEntity.ok().body(new ResponsePayloadHashMap(true, "", pcjArrayList));
+            } else {
+                throw new UserIdNotFoundException();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
+        }
+    }
 
     // Create a post using token and post object from request body
     @PostMapping(path = "/create/post/by/token")
