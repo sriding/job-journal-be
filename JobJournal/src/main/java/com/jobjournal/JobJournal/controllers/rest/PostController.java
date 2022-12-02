@@ -135,7 +135,8 @@ public class PostController extends RequiredAbstractClassForControllers {
             if (userId.isPresent()) {
                 ArrayList<PostsWithCompaniesAndJobsInterface> pcjArrayList = this.postServices.getRepository()
                         .getPostsWithCompaniesWithJobsWithStartingIndexAndWithFilter(userId.get(), postId, text);
-                return ResponseEntity.ok().body(new ResponsePayloadHashMap(true, "", pcjArrayList));
+                return ResponseEntity.ok()
+                        .body(new ResponsePayloadHashMap(true, "", pcjArrayList).getResponsePayloadHashMap());
             } else {
                 throw new UserIdNotFoundException();
             }
