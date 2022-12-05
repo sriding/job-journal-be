@@ -1,12 +1,17 @@
 package com.jobjournal.JobJournal.shared.models.composition;
 
+import javax.validation.Valid;
+
 import com.jobjournal.JobJournal.shared.models.entity.Company;
 import com.jobjournal.JobJournal.shared.models.entity.Job;
 import com.jobjournal.JobJournal.shared.models.entity.Post;
 
 public class PostsWithCompaniesAndJobs {
+    @Valid
     private Post _post;
+    @Valid
     private Company _company;
+    @Valid
     private Job _job;
 
     public PostsWithCompaniesAndJobs(Post _post, Company _company, Job _job) {

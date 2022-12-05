@@ -9,32 +9,58 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long _job_id;
+
+    @Valid
     @OneToOne
     @JoinColumn(name = "_post_id_fk_job", referencedColumnName = "_post_id", nullable = false, unique = true)
     private Post _post;
 
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     @Column(nullable = false)
     private String _job_title;
+
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
+    @Size(max = 6000, message = "Maximum of 6000 characters.")
+    @Column(length = 6000)
     private String _job_information;
+
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     private String _job_location;
+
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     private String _job_type;
+
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     private String _job_status;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Pattern(regexp = "^[0-9-]*$", message = "Text can only consist of numbers and dashes")
     private String _job_application_submitted_date;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Pattern(regexp = "^[0-9-]*$", message = "Text can only consist of numbers and dashes")
     private String _job_application_dismissed_date;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(updatable = false)
     private Date _job_creation_date;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @UpdateTimestamp
     private Date _job_update_date;
 

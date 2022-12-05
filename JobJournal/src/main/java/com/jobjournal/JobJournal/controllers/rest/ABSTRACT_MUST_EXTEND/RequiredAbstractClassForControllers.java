@@ -14,6 +14,8 @@ public abstract class RequiredAbstractClassForControllers {
     // Domain for communicating with Auth0
     @Value("${AUTH0_DOMAIN}")
     private String auth0Domain;
+    @Value("${AUTH0_AUDIENCE}")
+    private String auth0Audience;
 
     protected final Optional<Long> getUserIdByToken(String token, String auth0Domain, UsersRepository usersRepository)
             throws Exception {
@@ -44,5 +46,9 @@ public abstract class RequiredAbstractClassForControllers {
 
     protected final String getAuth0Domain() {
         return this.auth0Domain;
+    }
+
+    protected final String getAuth0Audience() {
+        return this.auth0Audience;
     }
 }

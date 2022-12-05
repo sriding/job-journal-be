@@ -50,6 +50,13 @@ public class DBTransactionServices {
     }
 
     @Transactional
+    public void deleteUserWithProfileWithSetting(Long userId, Long profileId, Long settingId) {
+        this.settingRepository.deleteById(settingId);
+        this.userProfilesRepository.deleteById(profileId);
+        this.usersRepository.deleteById(userId);
+    }
+
+    @Transactional
     public UserWithProfileWithSetting createUserWithProfileWithSetting(Users user, UserProfiles userProfiles,
             Setting setting) {
         this.usersRepository.save(user);

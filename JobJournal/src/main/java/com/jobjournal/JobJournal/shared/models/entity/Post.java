@@ -11,9 +11,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Post {
@@ -21,17 +26,23 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long _post_id;
 
+    @Valid
     @ManyToOne
     @JoinColumn(name = "_user_id_fk_post", referencedColumnName = "_user_id", nullable = false)
     private Users _user;
 
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
+    @Size(max = 6000, message = "Maximum of 6000 characters.")
+    @Column(length = 6000)
     private String _post_notes;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(updatable = false)
     private Date _post_creation_date;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date _post_update_date;
 
     @OneToOne(mappedBy = "_post", cascade = CascadeType.ALL)

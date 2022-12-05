@@ -11,9 +11,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Users {
@@ -21,14 +25,18 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long _user_id;
 
+    @NotBlank
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     @Column(unique = true, nullable = false)
     private String _auth0_id;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(updatable = false)
     private Date _user_creation_date;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date _user_update_date;
 
     @OneToOne(mappedBy = "_user", cascade = CascadeType.ALL)

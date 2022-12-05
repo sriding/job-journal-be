@@ -10,9 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "userprofiles")
@@ -21,18 +25,22 @@ public class UserProfiles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long _profile_id;
 
+    @Valid
     @OneToOne
     @JoinColumn(name = "_user_id_fk_profile", referencedColumnName = "_user_id", nullable = false, unique = true)
     private Users _user;
 
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     @Column(nullable = false)
     private String _profile_name;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(updatable = false)
     private Date _profile_creation_date;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date _profile_update_date;
 
     // no arg constructor required for entity object

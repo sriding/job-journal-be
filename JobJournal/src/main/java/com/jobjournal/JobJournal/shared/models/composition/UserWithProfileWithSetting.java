@@ -1,13 +1,18 @@
 package com.jobjournal.JobJournal.shared.models.composition;
 
+import javax.validation.Valid;
+
 import com.jobjournal.JobJournal.shared.interfaces.UserWithProfileWithSettingsInterface;
 import com.jobjournal.JobJournal.shared.models.entity.Setting;
 import com.jobjournal.JobJournal.shared.models.entity.UserProfiles;
 import com.jobjournal.JobJournal.shared.models.entity.Users;
 
 public class UserWithProfileWithSetting implements UserWithProfileWithSettingsInterface {
+    @Valid
     private Users _user;
+    @Valid
     private UserProfiles _userProfiles;
+    @Valid
     private Setting _setting;
 
     public UserWithProfileWithSetting() {

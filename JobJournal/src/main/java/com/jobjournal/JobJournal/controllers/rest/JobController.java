@@ -2,11 +2,21 @@ package com.jobjournal.JobJournal.controllers.rest;
 
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
@@ -33,6 +44,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Post;
 
 @RestController
 @RequestMapping(path = "/api/job")
+@Validated
 @CrossOrigin
 public class JobController extends RequiredAbstractClassForControllers {
     // Services
@@ -48,10 +60,24 @@ public class JobController extends RequiredAbstractClassForControllers {
         this.usersServices = new UsersServices(usersRepository);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ResponsePayloadHashMap tempHM = new ResponsePayloadHashMap();
+        tempHM.set_success(false);
+        tempHM.set_payload(null);
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            tempHM.getResponsePayloadHashMap().put("_message", errorMessage);
+        });
+
+        return ResponseEntity.badRequest().body(tempHM.getResponsePayloadHashMap());
+    }
+
     // Get job data by token and post id
     @GetMapping(path = "/get/job/by/{postId}")
     public ResponseEntity<?> getJobByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId) {
+            @PathVariable @Min(-1) Long postId) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId
@@ -84,9 +110,9 @@ public class JobController extends RequiredAbstractClassForControllers {
     }
 
     // Create job using token and post id with job object in the body of the request
-    @PostMapping(path = "/create/job/by/{postId}")
+    @PostMapping(path = "/create/job/by/{postId}", consumes = { "application/json" })
     public ResponseEntity<?> createJobByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @RequestBody Job job, @PathVariable Long postId) {
+            @Valid @RequestBody Job job, @PathVariable @Min(-1) Long postId) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId
@@ -98,6 +124,13 @@ public class JobController extends RequiredAbstractClassForControllers {
                         // The client does not include the Post attribute in the request body, so it
                         // must be manually added
                         job.set_post(post.get());
+                        // Jsoup for validation/cleaning
+                        job.set_job_information(Jsoup.clean(job.get_job_information(), "", Safelist.none(),
+                                new OutputSettings().prettyPrint(false)));
+                        job.set_job_location(Jsoup.clean(job.get_job_location(), Safelist.none()));
+                        job.set_job_status(Jsoup.clean(job.get_job_status(), Safelist.none()));
+                        job.set_job_title(Jsoup.clean(job.get_job_title(), Safelist.none()));
+                        job.set_job_type(Jsoup.clean(job.get_job_type(), Safelist.none()));
                         Job newJob = this.jobServices.getRepository().save(job);
                         return ResponseEntity.ok()
                                 .body(new ResponsePayloadHashMap(true, "", newJob).getResponsePayloadHashMap());
@@ -117,9 +150,9 @@ public class JobController extends RequiredAbstractClassForControllers {
     }
 
     // Update job using token and post id with job object in the body of the request
-    @PutMapping(path = "/update/job/by/{postId}")
+    @PutMapping(path = "/update/job/by/{postId}", consumes = { "application/json" })
     public ResponseEntity<?> updateJobByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @RequestBody Job job, @PathVariable Long postId) {
+            @Valid @RequestBody Job job, @PathVariable @Min(-1) Long postId) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId
@@ -129,14 +162,18 @@ public class JobController extends RequiredAbstractClassForControllers {
                 if (post.isPresent()) {
                     if (userId.get() == post.get().get_user().get_user_id()) {
                         Optional<Job> dbJob = this.jobServices.getRepository().getJobByPostId(postId);
+                        // Jsoup for validation/cleaning
                         dbJob.map(j -> {
-                            j.set_job_title(job.get_job_title());
-                            j.set_job_information(job.get_job_information());
-                            j.set_job_location(job.get_job_location());
-                            j.set_job_type(job.get_job_type());
-                            j.set_job_status(job.get_job_status());
-                            j.set_job_application_submitted_date(job.get_job_application_submitted_date());
-                            j.set_job_application_dismissed_date(job.get_job_application_dismissed_date());
+                            j.set_job_title(Jsoup.clean(job.get_job_title(), Safelist.none()));
+                            j.set_job_information(Jsoup.clean(job.get_job_information(), "", Safelist.none(),
+                                    new OutputSettings().prettyPrint(false)));
+                            j.set_job_location(Jsoup.clean(job.get_job_location(), Safelist.none()));
+                            j.set_job_type(Jsoup.clean(job.get_job_type(), Safelist.none()));
+                            j.set_job_status(Jsoup.clean(job.get_job_status(), Safelist.none()));
+                            j.set_job_application_submitted_date(
+                                    Jsoup.clean(job.get_job_application_submitted_date(), Safelist.none()));
+                            j.set_job_application_dismissed_date(
+                                    Jsoup.clean(job.get_job_application_dismissed_date(), Safelist.none()));
 
                             return this.jobServices.getRepository().save(j);
                         });
@@ -161,7 +198,7 @@ public class JobController extends RequiredAbstractClassForControllers {
     // Delete job using token and postId
     @DeleteMapping(path = "/delete/job/by/{postId}")
     public ResponseEntity<?> deleteJobByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId) {
+            @PathVariable @Min(-1) Long postId) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId

@@ -3,11 +3,23 @@ package com.jobjournal.JobJournal.controllers.rest;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
@@ -39,9 +52,11 @@ import com.jobjournal.JobJournal.shared.models.entity.Company;
 import com.jobjournal.JobJournal.shared.models.entity.Job;
 import com.jobjournal.JobJournal.shared.models.entity.Post;
 import com.jobjournal.JobJournal.shared.models.entity.Users;
+import com.jobjournal.JobJournal.shared.models.validation.FilteredPostText;
 
 @RestController
 @RequestMapping(path = "/api/post")
+@Validated
 @CrossOrigin
 public class PostController extends RequiredAbstractClassForControllers {
     // services
@@ -52,7 +67,7 @@ public class PostController extends RequiredAbstractClassForControllers {
     private final JobServices jobServices;
 
     // constants
-    // How many posts should one get request pull at a time? (save memory)
+    // How many posts should one get request pull at a time (save memory)
     private final int GET_POSTS_LIMIT = 20;
 
     // Add in repositories for services
@@ -66,11 +81,25 @@ public class PostController extends RequiredAbstractClassForControllers {
         this.jobServices = new JobServices(jobRepository);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ResponsePayloadHashMap tempHM = new ResponsePayloadHashMap();
+        tempHM.set_success(false);
+        tempHM.set_payload(null);
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            tempHM.getResponsePayloadHashMap().put("_message", errorMessage);
+        });
+
+        return ResponseEntity.badRequest().body(tempHM.getResponsePayloadHashMap());
+    }
+
     // Gets range of the latest posts for a certain user, by using the token. Limit
     // number decides starting point of range.
     @GetMapping(path = "/get/posts/by/token/{indexLimit}")
     public ResponseEntity<?> getPostsByToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable int indexLimit) {
+            @PathVariable @Min(-1) int indexLimit) {
         try {
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
@@ -109,7 +138,7 @@ public class PostController extends RequiredAbstractClassForControllers {
 
     @GetMapping(path = "/get/posts/with/company/and/job/by/token/{postId}")
     public ResponseEntity<?> getPostsWithCompaniesWithJobsByTokenWithStartingIndex(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long postId) {
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable @Min(-1) Long postId) {
         try {
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
@@ -126,15 +155,19 @@ public class PostController extends RequiredAbstractClassForControllers {
         }
     }
 
-    @GetMapping(path = "/get/posts/with/company/and/job/by/token/{postId}/filtered/by/{text}")
+    // Really a GET request with a body
+    @PostMapping(path = "/get/posts/with/company/and/job/filtered/by/token/{postId}", consumes = { "application/json" })
     public ResponseEntity<?> getPostsWithCompaniesWithJobsByTokenWithStartingIndexFilteredByText(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long postId,
-            @PathVariable String text) {
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable @Min(-1) Long postId,
+            @Valid @RequestBody FilteredPostText text) {
         try {
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
+                // Jsoup for body validation/cleaning
+                String escapedText = Jsoup.clean(text.get_text(), Safelist.none());
                 ArrayList<PostsWithCompaniesAndJobsInterface> pcjArrayList = this.postServices.getRepository()
-                        .getPostsWithCompaniesWithJobsWithStartingIndexAndWithFilter(userId.get(), postId, text);
+                        .getPostsWithCompaniesWithJobsWithStartingIndexAndWithFilter(userId.get(), postId,
+                                escapedText);
                 return ResponseEntity.ok()
                         .body(new ResponsePayloadHashMap(true, "", pcjArrayList).getResponsePayloadHashMap());
             } else {
@@ -147,16 +180,18 @@ public class PostController extends RequiredAbstractClassForControllers {
     }
 
     // Create a post using token and post object from request body
-    @PostMapping(path = "/create/post/by/token")
+    @PostMapping(path = "/create/post/by/token", consumes = { "application/json" })
     public ResponseEntity<?> createPostByToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @RequestBody Post post) {
+            @Valid @RequestBody Post post) {
         try {
-            System.out.println(post);
             Optional<Users> user = getUserByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (user.isPresent()) {
                 // Post in request body does not have User attribute set, so it must be manually
                 // set
                 post.set_user(user.get());
+                // Jsoup for validation/cleaning
+                post.set_post_notes(Jsoup.clean(post.get_post_notes(), "", Safelist.none(),
+                        new OutputSettings().prettyPrint(false)));
                 Post newPost = this.postServices.getRepository()
                         .save(this.postServices.getRepository().save(post));
                 return ResponseEntity.ok()
@@ -170,23 +205,31 @@ public class PostController extends RequiredAbstractClassForControllers {
         }
     }
 
-    @PostMapping(path = "/create/post/with/company/with/job/by/token")
+    @PostMapping(path = "/create/post/with/company/with/job/by/token", consumes = { "application/json" })
     public ResponseEntity<?> createPostWithCompanyWithJobByToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @RequestBody PostsWithCompaniesAndJobs pcj) {
+            @Valid @RequestBody PostsWithCompaniesAndJobs pcj) {
         try {
             Optional<Users> user = getUserByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (user.isPresent()) {
-                Post newPost = new Post(user.get(), pcj.get_post().get_post_notes());
+                // Jsoup for validation/cleaning
+                Post newPost = new Post(user.get(), Jsoup.clean(pcj.get_post().get_post_notes(), "", Safelist.none(),
+                        new OutputSettings().prettyPrint(false)));
                 PostsWithCompaniesAndJobs postsWithCompaniesAndJobs = this.dbTransactionServices
                         .createPostWithCompanyWithJob(newPost,
-                                new Company(newPost, pcj.get_company().get_company_name(),
-                                        pcj.get_company().get_company_website(),
-                                        pcj.get_company().get_company_information()),
-                                new Job(newPost, pcj.get_job().get_job_title(), pcj.get_job().get_job_information(),
-                                        pcj.get_job().get_job_location(),
-                                        pcj.get_job().get_job_type(), pcj.get_job().get_job_status(),
-                                        pcj.get_job().get_job_application_submitted_date(),
-                                        pcj.get_job().get_job_application_dismissed_date()));
+                                new Company(newPost, Jsoup.clean(pcj.get_company().get_company_name(), Safelist.none()),
+                                        Jsoup.clean(pcj.get_company().get_company_website(), Safelist.none()),
+                                        Jsoup.clean(pcj.get_company().get_company_information(), "", Safelist.none(),
+                                                new OutputSettings().prettyPrint(false))),
+                                new Job(newPost, Jsoup.clean(pcj.get_job().get_job_title(), Safelist.none()),
+                                        Jsoup.clean(pcj.get_job().get_job_information(), "", Safelist.none(),
+                                                new OutputSettings().prettyPrint(false)),
+                                        Jsoup.clean(pcj.get_job().get_job_location(), Safelist.none()),
+                                        Jsoup.clean(pcj.get_job().get_job_type(), Safelist.none()),
+                                        Jsoup.clean(pcj.get_job().get_job_status(), Safelist.none()),
+                                        Jsoup.clean(pcj.get_job().get_job_application_submitted_date(),
+                                                Safelist.none()),
+                                        Jsoup.clean(pcj.get_job().get_job_application_dismissed_date(),
+                                                Safelist.none())));
                 return ResponseEntity.ok().body(
                         new ResponsePayloadHashMap(true, "", postsWithCompaniesAndJobs).getResponsePayloadHashMap());
 
@@ -201,18 +244,20 @@ public class PostController extends RequiredAbstractClassForControllers {
 
     // Update a post using a token and post id, with request body containing a post
     // object
-    @PutMapping(path = "/update/post/by/{postId}")
+    @PutMapping(path = "/update/post/by/{postId}", consumes = { "application/json" })
     public ResponseEntity<?> updatePostByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId,
-            @RequestBody Post post) {
+            @PathVariable @Min(-1) Long postId,
+            @Valid @RequestBody Post post) {
         try {
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {
                 Optional<Post> dbPost = this.postServices.getRepository().findById(postId);
+                // Jsoup for validation/cleaning
                 if (dbPost.isPresent()) {
                     if (userId.get() == dbPost.get().get_user().get_user_id()) {
                         dbPost.map(p -> {
-                            p.set_post_notes(post.get_post_notes());
+                            p.set_post_notes(Jsoup.clean(post.get_post_notes(), "", Safelist.none(),
+                                    new OutputSettings().prettyPrint(false)));
 
                             return this.postServices.getRepository().save(p);
                         });
@@ -236,7 +281,7 @@ public class PostController extends RequiredAbstractClassForControllers {
 
     @DeleteMapping(path = "/delete/post/by/{postId}")
     public ResponseEntity<?> deletePostByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId) {
+            @PathVariable @Min(-1) Long postId) {
         try {
             Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
             if (userId.isPresent()) {

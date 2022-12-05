@@ -9,9 +9,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Company {
@@ -19,20 +24,30 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long _company_id;
 
+    @Valid
     @OneToOne
     @JoinColumn(name = "_post_id_fk_company", referencedColumnName = "_post_id", nullable = false, unique = true)
     private Post _post;
 
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     @Column(nullable = false)
     private String _company_name;
+
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     private String _company_website;
+
+    @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
+    @Size(max = 6000, message = "Maximum of 6000 characters.")
+    @Column(length = 6000)
     private String _company_information;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(updatable = false)
     private Date _company_creation_date;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date _company_update_date;
 
     // no-arg constructor required for entity object

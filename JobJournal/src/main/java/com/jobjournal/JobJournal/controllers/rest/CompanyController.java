@@ -2,11 +2,22 @@ package com.jobjournal.JobJournal.controllers.rest;
 
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document.OutputSettings;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
@@ -33,6 +45,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Post;
 
 @RestController
 @RequestMapping(path = "/api/company")
+@Validated
 @CrossOrigin
 public class CompanyController extends RequiredAbstractClassForControllers {
     // Services
@@ -49,10 +62,24 @@ public class CompanyController extends RequiredAbstractClassForControllers {
         this.usersServices = new UsersServices(usersRepository);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ResponsePayloadHashMap tempHM = new ResponsePayloadHashMap();
+        tempHM.set_success(false);
+        tempHM.set_payload(null);
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            tempHM.getResponsePayloadHashMap().put("_message", errorMessage);
+        });
+
+        return ResponseEntity.badRequest().body(tempHM.getResponsePayloadHashMap());
+    }
+
     // Get company data with token and post id
     @GetMapping(path = "/get/company/by/{postId}")
     public ResponseEntity<?> getCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId) {
+            @PathVariable @Min(-1) Long postId) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId
@@ -85,10 +112,10 @@ public class CompanyController extends RequiredAbstractClassForControllers {
 
     // Create new company using token and post id, along with company model data
     // present in request body
-    @PostMapping(path = "/create/company/by/{postId}")
+    @PostMapping(path = "/create/company/by/{postId}", consumes = { "application/json" })
     public ResponseEntity<?> createCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId,
-            @RequestBody Company company) {
+            @PathVariable @Min(-1) Long postId,
+            @Valid @RequestBody Company company) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId
@@ -100,6 +127,12 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                         // The requester does not pass in a post attribute for the company, so it must
                         // be added manually.
                         company.set_post(post.get());
+                        // Jsoup for validation/cleaning
+                        company.set_company_information(
+                                Jsoup.clean(company.get_company_information(), "", Safelist.none(),
+                                        new OutputSettings().prettyPrint(false)));
+                        company.set_company_name(Jsoup.clean(company.get_company_name(), Safelist.none()));
+                        company.set_company_website(Jsoup.clean(company.get_company_website(), Safelist.none()));
                         Company newCompany = this.companyServices.getRepository().save(company);
                         return ResponseEntity.ok()
                                 .body(new ResponsePayloadHashMap(true, "", newCompany).getResponsePayloadHashMap());
@@ -119,10 +152,10 @@ public class CompanyController extends RequiredAbstractClassForControllers {
     }
 
     // Update company data using the token and post id
-    @PutMapping(path = "/update/company/by/{postId}")
+    @PutMapping(path = "/update/company/by/{postId}", consumes = { "application/json" })
     public ResponseEntity<?> updateCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId,
-            @RequestBody Company company) {
+            @PathVariable @Min(-1) Long postId,
+            @Valid @RequestBody Company company) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId
@@ -132,11 +165,14 @@ public class CompanyController extends RequiredAbstractClassForControllers {
                 if (post.isPresent()) {
                     if (userId.get() == post.get().get_user().get_user_id()) {
                         Optional<Company> dbCompany = this.companyServices.getRepository().findCompanyByPostId(postId);
+                        // Jsoup for validation/cleaning
                         if (dbCompany.isPresent()) {
                             dbCompany.map(c -> {
-                                c.set_company_name(company.get_company_name());
-                                c.set_company_website(company.get_company_website());
-                                c.set_company_information(company.get_company_information());
+                                c.set_company_name(Jsoup.clean(company.get_company_name(), Safelist.none()));
+                                c.set_company_website(Jsoup.clean(company.get_company_website(), Safelist.none()));
+                                c.set_company_information(
+                                        Jsoup.clean(company.get_company_information(), "", Safelist.none(),
+                                                new OutputSettings().prettyPrint(false)));
 
                                 return this.companyServices.getRepository().save(c);
                             });
@@ -164,7 +200,7 @@ public class CompanyController extends RequiredAbstractClassForControllers {
     // Delete a company using token and post id
     @DeleteMapping(path = "/delete/company/by/{postId}")
     public ResponseEntity<?> deleteCompanyByPostId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-            @PathVariable Long postId) {
+            @PathVariable @Min(-1) Long postId) {
         try {
             // Have to confirm the user id obtained through the token matches the user id
             // present in the post obtained from the postId

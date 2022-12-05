@@ -5,12 +5,18 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
@@ -27,6 +33,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 
 @RestController
 @RequestMapping(path = "/api/setting")
+@Validated
 @CrossOrigin
 public class SettingController extends RequiredAbstractClassForControllers {
     // Services
@@ -38,6 +45,20 @@ public class SettingController extends RequiredAbstractClassForControllers {
     public SettingController(SettingRepository settingRepository, UsersRepository usersRepository) {
         this.settingServices = new SettingServices(settingRepository);
         this.usersServices = new UsersServices(usersRepository);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ResponsePayloadHashMap tempHM = new ResponsePayloadHashMap();
+        tempHM.set_success(false);
+        tempHM.set_payload(null);
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage();
+            tempHM.getResponsePayloadHashMap().put("_message", errorMessage);
+        });
+
+        return ResponseEntity.badRequest().body(tempHM.getResponsePayloadHashMap());
     }
 
     // Get settings data using token

@@ -9,9 +9,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.Valid;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Setting {
@@ -19,15 +22,18 @@ public class Setting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long _setting_id;
 
+    @Valid
     @OneToOne
     @JoinColumn(name = "_user_id_fk_setting", referencedColumnName = "_user_id", nullable = false, unique = true)
     private Users _user;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(updatable = false)
     private Date _setting_creation_date;
 
     @UpdateTimestamp
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date _setting_update_date;
 
     // no-arg constructor required for entity object
