@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,6 +30,9 @@ public class Users {
     @Pattern(regexp = "^[^&<>`]*$", message = "Text cannot contain the following characters: >^<`&")
     @Column(unique = true, nullable = false)
     private String _auth0_id;
+
+    @NotNull
+    private Boolean _deactivate = false;
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -54,6 +58,14 @@ public class Users {
 
     public Users(String _auth0_id) {
         this._auth0_id = _auth0_id;
+    }
+
+    public Boolean get_deactivate() {
+        return _deactivate;
+    }
+
+    public void set_deactivate(Boolean _deactivate) {
+        this._deactivate = _deactivate;
     }
 
     public Long get_user_id() {

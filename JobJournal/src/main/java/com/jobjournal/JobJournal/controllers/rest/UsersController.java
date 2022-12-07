@@ -2,7 +2,6 @@ package com.jobjournal.JobJournal.controllers.rest;
 
 import java.util.Optional;
 
-import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,11 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,13 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jobjournal.JobJournal.controllers.rest.ABSTRACT_MUST_EXTEND.RequiredAbstractClassForControllers;
 import com.jobjournal.JobJournal.exceptions.handlers.UserIdNotFoundException;
-import com.jobjournal.JobJournal.exceptions.handlers.UserProfileOrSettingsNotFoundException;
+import com.jobjournal.JobJournal.exceptions.handlers.UserNotFoundException;
 import com.jobjournal.JobJournal.repositories.SettingRepository;
 import com.jobjournal.JobJournal.repositories.UserProfilesRepository;
 import com.jobjournal.JobJournal.repositories.UsersRepository;
 import com.jobjournal.JobJournal.services.DBTransactionServices;
-import com.jobjournal.JobJournal.services.SettingServices;
-import com.jobjournal.JobJournal.services.UserProfilesServices;
 import com.jobjournal.JobJournal.services.UsersServices;
 import com.jobjournal.JobJournal.shared.datastructures.ResponsePayloadHashMap;
 import com.jobjournal.JobJournal.shared.helpers.Auth0RequestService;
@@ -47,8 +43,6 @@ public class UsersController extends RequiredAbstractClassForControllers {
     // Services
     private final UsersServices usersServices;
     private final DBTransactionServices dbTransactionServices;
-    private final UserProfilesServices userProfilesServices;
-    private final SettingServices settingServices;
 
     // Pass in repositories that will work with services
     @Autowired
@@ -57,8 +51,6 @@ public class UsersController extends RequiredAbstractClassForControllers {
         this.usersServices = new UsersServices(usersRepository);
         this.dbTransactionServices = new DBTransactionServices(usersRepository, userProfilesRepository,
                 settingRepository);
-        this.userProfilesServices = new UserProfilesServices(userProfilesRepository);
-        this.settingServices = new SettingServices(settingRepository);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -134,33 +126,20 @@ public class UsersController extends RequiredAbstractClassForControllers {
         }
     }
 
-    @DeleteMapping(path = "/delete")
-    public ResponseEntity<?> deleteUserUsingToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    @PutMapping(path = "/update/user/mark/for/deletion")
+    public ResponseEntity<?> markUserForDeletion(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
-            // First remove information from Auth0
-            String auth0Id = getAuth0IdByToken(token, getAuth0Domain());
-            String response = Auth0RequestService.deleteUserFromFromAuth0(token, getAuth0Domain(), getAuth0Audience());
-            System.out.println(response);
-            // Next remove information from local db
-            Optional<Long> userId = this.usersServices.getRepository().findUserIdByAuth0Id(auth0Id);
-            if (userId.isPresent()) {
-                Optional<UserProfiles> profile = this.userProfilesServices.getRepository()
-                        .findUserProfileByUserId(userId.get());
-                Optional<Setting> setting = this.settingServices.getRepository().findSettingByUserId(userId.get());
-                if (profile.isPresent() && setting.isPresent()) {
-                    this.dbTransactionServices.deleteUserWithProfileWithSetting(userId.get(),
-                            profile.get().get_profile_id(), setting.get().get_setting_id());
-                    return ResponseEntity.ok()
-                            .body(new ResponsePayloadHashMap(true, "User, profile, and settings deleted.", null)
-                                    .getResponsePayloadHashMap());
-                } else {
-                    throw new UserProfileOrSettingsNotFoundException();
-                }
+            Optional<Users> user = this.getUserByToken(token, this.getAuth0Domain(),
+                    this.usersServices.getRepository());
+            if (user.isPresent()) {
+                user.get().set_deactivate(true);
+                this.usersServices.getRepository().save(user.get());
+                return ResponseEntity.ok().body(new ResponsePayloadHashMap(true, "Account marked for deletion.", null)
+                        .getResponsePayloadHashMap());
             } else {
-                throw new UserIdNotFoundException();
+                throw new UserNotFoundException();
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
             return ResponseEntity.badRequest()
                     .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
         }
