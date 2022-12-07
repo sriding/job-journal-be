@@ -35,6 +35,11 @@ public class UserWithProfileWithSetting implements UserWithProfileWithSettingsIn
         this._user = _user;
     }
 
+    @Override
+    public boolean get_deactivate() {
+        return this._user.get_deactivate();
+    }
+
     public UserProfiles get_userProfiles() {
         return _userProfiles;
     }
