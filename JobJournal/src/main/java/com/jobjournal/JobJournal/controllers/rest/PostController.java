@@ -55,7 +55,7 @@ import com.jobjournal.JobJournal.shared.models.validation.FilteredPostText;
 @RestController
 @RequestMapping(path = "/api/post")
 @Validated
-@CrossOrigin
+@CrossOrigin(origins = { "${spring.frontend.url}" }, maxAge = 3600)
 public class PostController extends RequiredAbstractClassForControllers {
     // services
     private final PostServices postServices;

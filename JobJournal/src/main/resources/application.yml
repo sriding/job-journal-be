@@ -1,6 +1,8 @@
 spring:
   config:
     import: optional:.env[.properties]
+  frontend:
+    url: ${FRONT_END_URL}
   auth0:
     domain: ${AUTH0_DOMAIN}
   datasource:

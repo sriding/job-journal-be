@@ -38,7 +38,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 @RestController
 @RequestMapping(path = "/api/users")
 @Validated
-@CrossOrigin
+@CrossOrigin(origins = { "${spring.frontend.url}" }, maxAge = 3600)
 public class UsersController extends RequiredAbstractClassForControllers {
     // Services
     private final UsersServices usersServices;

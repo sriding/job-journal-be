@@ -45,7 +45,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Post;
 @RestController
 @RequestMapping(path = "/api/company")
 @Validated
-@CrossOrigin
+@CrossOrigin(origins = { "${spring.frontend.url}" }, maxAge = 3600)
 public class CompanyController extends RequiredAbstractClassForControllers {
     // Services
     private final CompanyServices companyServices;

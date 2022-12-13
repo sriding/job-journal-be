@@ -33,7 +33,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 @RestController
 @RequestMapping(path = "/api/setting")
 @Validated
-@CrossOrigin
+@CrossOrigin(origins = { "${spring.frontend.url}" }, maxAge = 3600)
 public class SettingController extends RequiredAbstractClassForControllers {
     // Services
     private final SettingServices settingServices;
