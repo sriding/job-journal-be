@@ -85,6 +85,7 @@ public class UserProfilesController extends RequiredAbstractClassForControllers 
         }
     }
 
+    // TODO: Handle if the userprofile already exists; should still return success.
     // Create profile through the use of Auth0 token
     @PostMapping(path = "/create/userprofile/by/token")
     public ResponseEntity<?> createUserProfileByUserId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
@@ -105,6 +106,8 @@ public class UserProfilesController extends RequiredAbstractClassForControllers 
         }
     }
 
+    // TODO: Add functionality to create a temporary new profile just to be deleted.
+    // For testing purposes.
     // Delete profile through use of the Auth0 token
     @DeleteMapping(path = "/delete/userprofile/by/token")
     public ResponseEntity<?> deleteUserProfileByUserId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {

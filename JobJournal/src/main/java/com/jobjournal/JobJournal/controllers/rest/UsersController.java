@@ -84,20 +84,6 @@ public class UsersController extends RequiredAbstractClassForControllers {
         }
     }
 
-    // Create a new user using Auth0 token and requesting Auth0 user id from Auth0
-    @PostMapping(path = "/create/newuser/by/token")
-    public ResponseEntity<?> createUserUsingToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        try {
-            String auth0Id = getAuth0IdByToken(token, getAuth0Domain());
-            Users newUser = new Users(auth0Id);
-            this.usersServices.getRepository().save(newUser);
-            return ResponseEntity.ok().body(new ResponsePayloadHashMap(true, "", newUser).getResponsePayloadHashMap());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
-        }
-    }
-
     @PostMapping(path = "/create/newuser/with/profile/with/setting/by/token")
     public ResponseEntity<?> createUserWithProfileWithSettingByToken(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {

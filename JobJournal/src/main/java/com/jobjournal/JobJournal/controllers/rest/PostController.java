@@ -93,8 +93,10 @@ public class PostController extends RequiredAbstractClassForControllers {
         return ResponseEntity.badRequest().body(tempHM.getResponsePayloadHashMap());
     }
 
-    // Gets range of the latest posts for a certain user, by using the token. Limit
-    // number decides starting point of range.
+    // Gets range of the latest posts for a certain user, by using the token. Index
+    // Limit is the lower bound for posts received. All posts received will have a
+    // post id higher than the index limit. GET_POST_LIMIT is the total number of
+    // posts retrieved.
     @GetMapping(path = "/get/posts/by/token/{indexLimit}")
     public ResponseEntity<?> getPostsByToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
             @PathVariable @Min(-1) int indexLimit) {
@@ -134,6 +136,8 @@ public class PostController extends RequiredAbstractClassForControllers {
         }
     }
 
+    // Retrieves posts by using postId as the upper limit for posts received. All
+    // posts received will have a post id LOWER than postId.
     @GetMapping(path = "/get/posts/with/company/and/job/by/token/{postId}")
     public ResponseEntity<?> getPostsWithCompaniesWithJobsByTokenWithStartingIndex(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable @Min(-1) Long postId) {

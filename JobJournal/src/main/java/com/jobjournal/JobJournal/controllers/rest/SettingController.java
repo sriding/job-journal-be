@@ -82,6 +82,7 @@ public class SettingController extends RequiredAbstractClassForControllers {
         }
     }
 
+    // TODO: Needs to handle if a Setting already exists for a user
     // Create settings entry using token
     @PostMapping(path = "/create/setting/by/token")
     public ResponseEntity<?> saveSettingsInformationByUserId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
@@ -100,6 +101,7 @@ public class SettingController extends RequiredAbstractClassForControllers {
         }
     }
 
+    // TODO: Add functionality to create setting on the fly to delete
     // Delete settings entry using token
     @DeleteMapping(path = "/delete/setting/by/token")
     public ResponseEntity<?> deleteSettingsInformationByUserId(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
