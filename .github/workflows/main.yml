@@ -15,4 +15,5 @@ jobs:
           distribution: "temurin"
 
       - name: Run JUnit Tests
+        working-directory: ./JobJournal
         run: mvn --batch-mode --update-snapshots package && mvn test
