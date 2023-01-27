@@ -2,6 +2,7 @@ name: JUnit
 on: [push]
 jobs:
   mysql:
+    runs-on: ubuntu-latest
     env:
       DB_DATABASE: jobjournaldev
       DB_USER: root
