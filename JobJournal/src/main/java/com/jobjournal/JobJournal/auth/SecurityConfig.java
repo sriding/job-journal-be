@@ -19,7 +19,7 @@ public class SecurityConfig {
     @Value("${AUTH0_AUDIENCE}")
     private String audience;
 
-    @Value("${AUTH0_ISSUER-URI}")
+    @Value("${AUTH0_ISSUERURI}")
     private String issuer;
 
     @Bean

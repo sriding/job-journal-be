@@ -17,6 +17,6 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${AUTH0_ISSUER-URI}
+          issuer-uri: ${AUTH0_ISSUERURI}
 auth0:
   audience: ${AUTH0_AUDIENCE}
