@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.jobjournal.JobJournal.services.DBTransactionServices;
+import com.jobjournal.JobJournal.shared.interfaces.UserWithProfileWithSettingsInterface;
 import com.jobjournal.JobJournal.shared.models.entity.Company;
 import com.jobjournal.JobJournal.shared.models.entity.Job;
 import com.jobjournal.JobJournal.shared.models.entity.Post;
@@ -23,9 +24,9 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CompanyRepositoryTests {
+public class UsersRepositoryTests {
     @Autowired
-    private CompanyRepository instance;
+    public UsersRepository instance;
     private HashMap<String, Long> ids = new HashMap<>();
 
     @BeforeAll
@@ -48,32 +49,42 @@ public class CompanyRepositoryTests {
     }
 
     @Test
-    void givenPostId_whenQueryingDBForCompany_thenReturnCompany() {
-        Optional<Company> company = instance.findCompanyByPostId(ids.get("post_id"));
-        if (!company.isPresent()) {
-            fail("Company is not present in db.");
+    void givenAuth0Id_whenQueryingDBForUserId_thenReturnUserId() {
+        String auth0Id = "google-oauth2|110428753866664923333";
+        Optional<Long> userId = instance.findUserIdByAuth0Id(auth0Id);
+        if (!userId.isPresent()) {
+            fail("User id not found (likely user does not exist either)");
         }
-        assertAll("company", () -> assertEquals(company.get().get_company_id(), ids.get("company_id")),
-                () -> assertEquals(company.get().get_company_name(), "testing company name"),
-                () -> assertEquals(company.get().get_company_website(), ""),
-                () -> assertEquals(company.get().get_company_information(), ""));
+        assertAll("get user id from auth0 id", () -> assertEquals(userId.get(), ids.get("user_id")));
     }
 
     @Test
-    void givenPostId_whenQueryingDBForCompanyId_thenReturnCompanyId() {
-        Optional<Long> companyId = instance.findCompanyIdByPostId(ids.get("post_id"));
-        if (!companyId.isPresent()) {
-            fail("Company id not present in db (company probably isn't either).");
+    void givenAuth0Id_whenQueryingDBForUser_thenReturnUser() {
+        String auth0Id = "google-oauth2|110428753866664923333";
+        Optional<Users> user = instance.findUserByAuth0Id(auth0Id);
+        if (!user.isPresent()) {
+            fail("User is not present in database.");
         }
-        assertAll("company id", () -> assertEquals(companyId.get(), ids.get("company_id")));
+        assertAll("user", () -> assertEquals(user.get().get_user_id(), ids.get("user_id")),
+                () -> assertEquals(user.get().get_auth0_id(), auth0Id),
+                () -> assertEquals(user.get().get_deactivate(), false));
     }
 
     @Test
-    void givenPostId_whenQueryingDBToDeleteCompany_thenReturnRowsDeleted() {
-        int rowsDeleted = instance.deleteCompanyByPostId(ids.get("post_id"));
-        if (rowsDeleted == 0) {
-            fail("No company was deleted.");
+    void givenUserId_whenQueryingDBForUserWIthProfileWithSetting_thenReturnUser() {
+        Optional<UserWithProfileWithSettingsInterface> userProfileSetting = instance
+                .findUserWithProfileWithSettingByUserId(ids.get("user_id"));
+        if (!userProfileSetting.isPresent()) {
+            fail("User with profile and setting does not exist.");
         }
-        assertAll("", () -> assertEquals(rowsDeleted, 1));
+        assertAll("user with profile with setting",
+                () -> assertEquals(userProfileSetting.get().get_user_id(), ids.get("user_id")),
+                () -> assertEquals(userProfileSetting.get().get_auth0_id(), "google-oauth2|110428753866664923333"),
+                () -> assertEquals(userProfileSetting.get().get_deactivate(), false),
+                () -> assertEquals(userProfileSetting.get().get_profile_id(), ids.get("profile_id")),
+                () -> assertEquals(userProfileSetting.get().get_profile_name(), "Stephen Riding"),
+                () -> assertEquals(userProfileSetting.get().get_setting_id(), ids.get("setting_id")),
+                () -> assertEquals(userProfileSetting.get().get_user_id_fk_profile(), ids.get("user_id")),
+                () -> assertEquals(userProfileSetting.get().get_user_id_fk_setting(), ids.get("user_id")));
     }
 }

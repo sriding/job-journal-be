@@ -1,5 +1,7 @@
 package com.jobjournal.JobJournal.services;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,18 @@ public class DBTransactionServices {
         this.settingRepository = settingRepository;
     }
 
+    @Autowired
+    public DBTransactionServices(UsersRepository usersRepository, UserProfilesRepository userProfilesRepository,
+            SettingRepository settingRepository, PostRepository postRepository, JobRepository jobRepository,
+            CompanyRepository companyRepository) {
+        this.usersRepository = usersRepository;
+        this.userProfilesRepository = userProfilesRepository;
+        this.settingRepository = settingRepository;
+        this.postRepository = postRepository;
+        this.jobRepository = jobRepository;
+        this.companyRepository = companyRepository;
+    }
+
     @Transactional
     public void deletePostWithCompanyWithJob(Long postId, Long companyId, Long jobId) {
         this.companyRepository.deleteById(companyId);
@@ -73,5 +87,43 @@ public class DBTransactionServices {
         this.jobRepository.save(job);
 
         return new PostsWithCompaniesAndJobs(post, company, job);
+    }
+
+    @Transactional
+    public void truncateAllTablesInDatabase() {
+        this.companyRepository.deleteAll();
+        this.jobRepository.deleteAll();
+        this.postRepository.deleteAll();
+        this.userProfilesRepository.deleteAll();
+        this.settingRepository.deleteAll();
+        this.usersRepository.deleteAll();
+    }
+
+    @Transactional
+    public HashMap<String, Long> seedDatabase(Users user, UserProfiles userProfile, Setting setting, Post post,
+            Company company,
+            Job job) {
+        Users savedUser = this.usersRepository.save(user);
+        userProfile.set_user(savedUser);
+        UserProfiles savedProfile = this.userProfilesRepository.save(userProfile);
+        setting.set_user(savedUser);
+        Setting savedSetting = this.settingRepository.save(setting);
+        post.set_user(savedUser);
+        Post savedPost = this.postRepository.save(post);
+        company.set_post(savedPost);
+        Company savedCompany = this.companyRepository.save(company);
+        job.set_post(savedPost);
+        Job savedJob = this.jobRepository.save(job);
+
+        return new HashMap<String, Long>() {
+            {
+                put("user_id", savedUser.get_user_id());
+                put("profile_id", savedProfile.get_profile_id());
+                put("setting_id", savedSetting.get_setting_id());
+                put("post_id", savedPost.get_post_id());
+                put("company_id", savedCompany.get_company_id());
+                put("job_id", savedJob.get_job_id());
+            }
+        };
     }
 }

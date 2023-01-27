@@ -18,5 +18,4 @@ public interface UserProfilesRepository extends JpaRepository<UserProfiles, Long
     @Modifying
     @Query(value = "DELETE FROM userprofiles WHERE _user_id_fk_profile = ?1", nativeQuery = true)
     int deleteUserProfileByUserId(Long _user_id);
-
 }

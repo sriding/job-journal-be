@@ -23,9 +23,9 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CompanyRepositoryTests {
+public class JobRepositoryTests {
     @Autowired
-    private CompanyRepository instance;
+    public JobRepository instance;
     private HashMap<String, Long> ids = new HashMap<>();
 
     @BeforeAll
@@ -48,32 +48,37 @@ public class CompanyRepositoryTests {
     }
 
     @Test
-    void givenPostId_whenQueryingDBForCompany_thenReturnCompany() {
-        Optional<Company> company = instance.findCompanyByPostId(ids.get("post_id"));
-        if (!company.isPresent()) {
-            fail("Company is not present in db.");
+    void givenPostId_whenQueryingDBForJob_thenReturnJob() {
+        Optional<Job> job = instance.getJobByPostId(ids.get("post_id"));
+        if (job.isPresent() != true) {
+            fail("Job not found in database.");
         }
-        assertAll("company", () -> assertEquals(company.get().get_company_id(), ids.get("company_id")),
-                () -> assertEquals(company.get().get_company_name(), "testing company name"),
-                () -> assertEquals(company.get().get_company_website(), ""),
-                () -> assertEquals(company.get().get_company_information(), ""));
+        assertAll("job", () -> assertEquals(job.get().get_job_id(), ids.get("job_id")),
+                () -> assertEquals(job.get().get_job_title(), "testing job title"),
+                () -> assertEquals(job.get().get_job_information(), ""),
+                () -> assertEquals(job.get().get_job_location(), ""),
+                () -> assertEquals(job.get().get_job_status(), ""),
+                () -> assertEquals(job.get().get_job_type(), ""),
+                () -> assertEquals(job.get().get_job_application_submitted_date(), ""),
+                () -> assertEquals(job.get().get_job_application_dismissed_date(), ""));
     }
 
     @Test
-    void givenPostId_whenQueryingDBForCompanyId_thenReturnCompanyId() {
-        Optional<Long> companyId = instance.findCompanyIdByPostId(ids.get("post_id"));
-        if (!companyId.isPresent()) {
-            fail("Company id not present in db (company probably isn't either).");
+    void givenPostId_whenQueryingDBForJobId_thenReturnJobId() {
+        Optional<Long> jobId = instance.getJobIdByPostId(ids.get("post_id"));
+        if (jobId.isPresent() != true) {
+            fail("Job id not found (likely job also does not exist.");
         }
-        assertAll("company id", () -> assertEquals(companyId.get(), ids.get("company_id")));
+        assertAll("job id", () -> assertEquals(jobId.get(), ids.get("job_id")));
     }
 
-    @Test
-    void givenPostId_whenQueryingDBToDeleteCompany_thenReturnRowsDeleted() {
-        int rowsDeleted = instance.deleteCompanyByPostId(ids.get("post_id"));
-        if (rowsDeleted == 0) {
-            fail("No company was deleted.");
-        }
-        assertAll("", () -> assertEquals(rowsDeleted, 1));
-    }
+    // This test needs to be run last (order matters)
+    // @Test
+    // void givenPostId_whenQueryingDBToDeletePost_thenReturnRowsDeleted() {
+    // int rowsDeleted = instance.deleteJobByPostId(ids.get("post_id"));
+    // if (rowsDeleted == 0) {
+    // fail("Nothing was deleted.");
+    // }
+    // assertAll("rows deleted", () -> assertEquals(rowsDeleted, 1));
+    // }
 }

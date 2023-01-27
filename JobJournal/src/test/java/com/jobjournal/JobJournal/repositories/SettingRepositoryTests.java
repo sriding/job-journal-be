@@ -23,9 +23,9 @@ import com.jobjournal.JobJournal.shared.models.entity.Users;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CompanyRepositoryTests {
+public class SettingRepositoryTests {
     @Autowired
-    private CompanyRepository instance;
+    private SettingRepository instance;
     private HashMap<String, Long> ids = new HashMap<>();
 
     @BeforeAll
@@ -48,32 +48,20 @@ public class CompanyRepositoryTests {
     }
 
     @Test
-    void givenPostId_whenQueryingDBForCompany_thenReturnCompany() {
-        Optional<Company> company = instance.findCompanyByPostId(ids.get("post_id"));
-        if (!company.isPresent()) {
-            fail("Company is not present in db.");
+    void givenUserId_whenQueryingDBForSetting_thenReturnSetting() {
+        Optional<Setting> settings = instance.findSettingByUserId(ids.get("user_id"));
+        if (!settings.isPresent()) {
+            fail("Setting is not present in database.");
         }
-        assertAll("company", () -> assertEquals(company.get().get_company_id(), ids.get("company_id")),
-                () -> assertEquals(company.get().get_company_name(), "testing company name"),
-                () -> assertEquals(company.get().get_company_website(), ""),
-                () -> assertEquals(company.get().get_company_information(), ""));
+        assertAll("setting", () -> assertEquals(settings.get().get_setting_id(), ids.get("setting_id")));
     }
 
     @Test
-    void givenPostId_whenQueryingDBForCompanyId_thenReturnCompanyId() {
-        Optional<Long> companyId = instance.findCompanyIdByPostId(ids.get("post_id"));
-        if (!companyId.isPresent()) {
-            fail("Company id not present in db (company probably isn't either).");
-        }
-        assertAll("company id", () -> assertEquals(companyId.get(), ids.get("company_id")));
-    }
-
-    @Test
-    void givenPostId_whenQueryingDBToDeleteCompany_thenReturnRowsDeleted() {
-        int rowsDeleted = instance.deleteCompanyByPostId(ids.get("post_id"));
+    void givenUserId_whenQueryingDBForSettingToDelete_thenReturnDeletedRows() {
+        int rowsDeleted = instance.deleteSettingByUserId(ids.get("user_id"));
         if (rowsDeleted == 0) {
-            fail("No company was deleted.");
+            fail("No rows were deleted.");
         }
-        assertAll("", () -> assertEquals(rowsDeleted, 1));
+        assertAll("deleted setting", () -> assertEquals(rowsDeleted, 1));
     }
 }
