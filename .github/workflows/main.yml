@@ -7,6 +7,9 @@ jobs:
       MYSQL_URL: jdbc:mysql://localhost:3306/jobjournaldev
       MYSQL_USERNAME: root
       MYSQL_USER_PASSWORD: root
+      AUTH0_DOMAIN: dev-ebm7wkwb.auth0.com
+      AUTH0_ISSUER-URI: https://dev-ebm7wkwb.auth0.com/
+      AUTH0_AUDIENCE: https://dev-ebm7wkwb.auth0.com/api/v2/
       DB_DATABASE: jobjournaldev
       DB_USER: root
       DB_PASSWORD: root
