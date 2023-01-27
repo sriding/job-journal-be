@@ -15,6 +15,4 @@ jobs:
           distribution: "temurin"
 
       - name: Run JUnit Tests
-        run: mvn test
-        with:
-          build: mvn --batch-mode --update-snapshots package
+        run: mvn --batch-mode --update-snapshots package && mvn test
