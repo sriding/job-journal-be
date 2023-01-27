@@ -1,28 +1,24 @@
 name: JUnit
 on: [push]
 jobs:
-  mysql:
-    runs-on: ubuntu-latest
-    env:
-      DB_DATABASE: jobjournaldev
-      DB_USER: root
-      DB_PASSWORD: root
-    steps:
-      - name: Set up MySQL
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
   build:
-    needs: mysql
     runs-on: ubuntu-latest
     env:
       MYSQL_URL: jdbc:mysql://localhost:3306/jobjournaldev
       MYSQL_USERNAME: root
       MYSQL_USER_PASSWORD: root
+      DB_DATABASE: jobjournaldev
+      DB_USER: root
+      DB_PASSWORD: root
 
     steps:
       - name: checkout
         uses: "actions/checkout@v3"
+
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
 
       - name: Set up JDK 17
         uses: "actions/setup-java@v3"
