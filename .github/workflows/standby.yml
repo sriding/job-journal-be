@@ -31,5 +31,5 @@ jobs:
           distribution: "temurin"
 
       - name: Boot up Server
-        working-directory: job-journal-be/JobJournal
+        working-directory: jj/JobJournal
         run: mvn --batch-mode --update-snapshots package && mvn spring-boot:run
