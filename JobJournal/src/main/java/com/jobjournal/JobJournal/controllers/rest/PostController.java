@@ -11,8 +11,8 @@ import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -311,6 +311,19 @@ public class PostController extends RequiredAbstractClassForControllers {
             } else {
                 throw new UserIdNotFoundException();
             }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
+        }
+    }
+
+    // Unauthorized users fetching pre-created posts as samples to work with
+    @GetMapping(path = "/get/posts/from/specific/user/for/unauthorized/clients")
+    public ResponseEntity<?> getPostsFromSpecificUserForUnauthorizedClients() {
+        try {
+            ArrayList<PostsWithCompaniesAndJobsInterface> postList = postServices.getRepository()
+                    .getPostsWithCompaniesWithJobsNoStartingIndexFromSpecificUser();
+            return ResponseEntity.ok().body(new ResponsePayloadHashMap(true, "", postList).getResponsePayloadHashMap());
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
