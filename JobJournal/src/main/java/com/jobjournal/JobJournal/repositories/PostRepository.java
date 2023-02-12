@@ -28,6 +28,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         Long _user_id,
                         Long _post_id, String text);
 
+        @Query(value = "SELECT * FROM (SELECT _post_id, _post_notes, _user_id_fk_post, _company_id, _company_information, _company_name, _company_website, _post_id_fk_company, _job_id, _job_application_dismissed_date, _job_application_submitted_date, _job_information, _job_location, _job_status, _job_title, _job_type, _post_id_fk_job FROM post INNER JOIN company ON company._post_id_fk_company = post._post_id INNER JOIN job ON job._post_id_fk_job = post._post_id WHERE post._user_id_fk_post = ?1 AND post._post_id < ?2 AND (_job_title LIKE CONCAT('%', ?3, '%') OR _company_name LIKE CONCAT('%', ?3, '%') OR _company_website LIKE CONCAT('%', ?3, '%') OR _job_information LIKE CONCAT('%', ?3, '%') OR _job_status LIKE CONCAT('%', ?3, '%') OR _job_type LIKE CONCAT('%', ?3, '%')) ORDER BY post._post_id DESC LIMIT 20) AS textfiltereditems WHERE textfiltereditems._job_status REGEXP ?4 OR textfiltereditems._job_type REGEXP ?4", nativeQuery = true)
+        ArrayList<PostsWithCompaniesAndJobsInterface> getPostsWithCompaniesWithJobsWithStartingIndexAndWithFullFilter(
+                        Long _user_id,
+                        Long _post_id, String text, String filterTagsConcatted);
+
         // User that the posts are obtained from is manually entered inside this SQL
         // query.
         @Query(value = "SELECT _post_id, _post_notes, _user_id_fk_post, _company_id, _company_information, _company_name, _company_website, _post_id_fk_company, _job_id, _job_application_dismissed_date, _job_application_submitted_date, _job_information, _job_location, _job_status, _job_title, _job_type, _post_id_fk_job FROM post INNER JOIN company ON company._post_id_fk_company = post._post_id INNER JOIN job ON job._post_id_fk_job = post._post_id WHERE post._user_id_fk_post = 2 ORDER BY post._post_id DESC LIMIT 20", nativeQuery = true)

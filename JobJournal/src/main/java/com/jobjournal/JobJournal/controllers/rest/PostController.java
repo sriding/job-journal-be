@@ -1,7 +1,9 @@
 package com.jobjournal.JobJournal.controllers.rest;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -51,6 +53,7 @@ import com.jobjournal.JobJournal.shared.models.entity.Job;
 import com.jobjournal.JobJournal.shared.models.entity.Post;
 import com.jobjournal.JobJournal.shared.models.entity.Users;
 import com.jobjournal.JobJournal.shared.models.validation.FilteredPostText;
+import com.jobjournal.JobJournal.shared.models.validation.FullFilterValidationObject;
 
 @RestController
 @RequestMapping(path = "/api/post")
@@ -172,6 +175,45 @@ public class PostController extends RequiredAbstractClassForControllers {
                                 escapedText);
                 return ResponseEntity.ok()
                         .body(new ResponsePayloadHashMap(true, "", pcjArrayList).getResponsePayloadHashMap());
+            } else {
+                throw new UserIdNotFoundException();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponsePayloadHashMap(false, e.getMessage(), null).getResponsePayloadHashMap());
+        }
+    }
+
+    // Really a GET request with a body
+    @PostMapping(path = "/get/posts/with/company/and/job/with/full/filter/by/token/{postId}", consumes = {
+            "application/json" })
+    public ResponseEntity<?> getPostsWithCompaniesWithJobsApplyFullFilteringApplyStartingIndex(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+            @PathVariable @Min(-1) Long postId, @Valid @RequestBody FullFilterValidationObject filterObject) {
+        try {
+            Optional<Long> userId = getUserIdByToken(token, getAuth0Domain(), this.usersServices.getRepository());
+            if (userId.isPresent()) {
+                List<String> filterTagsList = filterObject.get_filter_tags();
+                StringBuilder sb = new StringBuilder("");
+                filterTagsList.stream().forEach(new Consumer<String>() {
+                    @Override
+                    public void accept(String t) {
+                        sb.append(t);
+                        sb.append("|");
+                    }
+                });
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                } else {
+                    sb.append(".*");
+                }
+
+                List<PostsWithCompaniesAndJobsInterface> retrievedFilteredList = this.postServices.getRepository()
+                        .getPostsWithCompaniesWithJobsWithStartingIndexAndWithFullFilter(
+                                userId.get(), postId, filterObject.get_text(), sb.toString());
+
+                return ResponseEntity.badRequest()
+                        .body(new ResponsePayloadHashMap(true, "", retrievedFilteredList).getResponsePayloadHashMap());
             } else {
                 throw new UserIdNotFoundException();
             }
